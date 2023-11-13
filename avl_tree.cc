@@ -48,7 +48,7 @@ int AVLTree::height(Node *target_node)
     else
         return target_node->height;
 }
-AVLTree::Node *AVLTree::FindNodePtr(int find_target)
+Node *AVLTree::FindNodePtr(int find_target)
 {
     Node *iterator = root_;
     while (iterator != nullptr && iterator->key != find_target)
@@ -61,7 +61,7 @@ int AVLTree::CalculateBalance(Node *target_node)
 {
     return target_node->left->height - target_node->right->height;
 }
-AVLTree::Node *AVLTree::LeftRotation(AVLTree::Node *old_axis) // 왼쪽 Roation을 수행합니다.
+Node *AVLTree::LeftRotation(Node *old_axis) // 왼쪽 Roation을 수행합니다.
 {
     Node *new_axis = old_axis->right;
     if (new_axis->left != nullptr)
@@ -77,9 +77,9 @@ AVLTree::Node *AVLTree::LeftRotation(AVLTree::Node *old_axis) // 왼쪽 Roation�
     new_axis->height = std::max(height(new_axis->left), height(new_axis->right)) + 1;
     return new_axis;
 }
-AVLTree::Node *AVLTree::RightRotation(AVLTree::Node *old_axis)
+Node *AVLTree::RightRotation(Node *old_axis)
 {
-    AVLTree::Node *new_axis = old_axis->left;
+    Node *new_axis = old_axis->left;
     if (new_axis->right != nullptr)
     {
         old_axis->left = new_axis->right;
@@ -94,7 +94,7 @@ AVLTree::Node *AVLTree::RightRotation(AVLTree::Node *old_axis)
     return new_axis;
 }
 
-void AVLTree::AdjustBlance(AVLTree::Node *root, int target_key) // root노드와 어떤 키를 기준으로 밸런스를 맞출지 정의합니다.
+void AVLTree::AdjustBlance(Node *root, int target_key) // root노드와 어떤 키를 기준으로 밸런스를 맞출지 정의합니다.
 {
     int balance_factor = CalculateBalance(root);
     if (balance_factor == -1 || balance_factor == 0 || balance_factor == 1) // 균형이 맞음, 밸런스 조정필요 없음
@@ -121,12 +121,12 @@ void AVLTree::AdjustBlance(AVLTree::Node *root, int target_key) // root노드와
     }
 }
 
-AVLTree::Node *AVLTree::InsertNode(Node *node, int value)
+Node *AVLTree::InsertNode(Node *node, int value)
 {
     // Implementation for insertion
 }
 
-AVLTree::Node *AVLTree::EraseNode(Node *root_node, int key_of_target)
+Node *AVLTree::EraseNode(Node *root_node, int key_of_target)
 {
     // Implementation for insertion
 }

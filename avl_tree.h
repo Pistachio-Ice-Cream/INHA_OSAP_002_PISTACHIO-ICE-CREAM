@@ -7,8 +7,7 @@ Created At: 2023-11-12, Created By: {rla1wo23}.
 #define AVL_TREE_H
 #include <algorithm>
 #include <iostream>
-class Node
-{
+class Node{
 private:
     int key;
     int height = 0;
@@ -16,8 +15,7 @@ private:
     Node *right = nullptr;
     friend class AVLTree;
 };
-class AVLTree
-{
+class AVLTree{
 public:        // 자식 클래스에서 public함수를 통해서만 AVLTree에 접근할 수 있게끔 합니다.
     AVLTree(); // Rule of Three를 만족하게끔 1)복사생성자 2)소멸자를 적절히 추가해야 합니다.
     ~AVLTree();
@@ -26,10 +24,10 @@ public:        // 자식 클래스에서 public함수를 통해서만 AVLTree에
     int Insert(int new_key);
     // 최솟값 찾기
     int Find(int x);
-    int minimum(int x);
-    int maximum(int x);
-    void rank(int x);
-    void erase(int x);
+    int Minimum(int x);
+    int Maximum(int x);
+    void Rank(int x);
+    void Erase(int x);
     int height(Node *target_node); // nullptr의 height를 호출할 수도 있는 경우가 발생할 수 있으므로, 멤버에 직접 접근하지 않고 함수로 접근하는게 안전합니다.
     /*직접 데이터 멤버들을 조작할 수 있는 위험한 함수들입니다.*/
 protected:                              // protected부분은 자식 클래스에서 직접 호출해서 사용할 수 없으므로 아래 함수들은 public함수를 통해서 접근해서 도구적으로 사용됩니다.

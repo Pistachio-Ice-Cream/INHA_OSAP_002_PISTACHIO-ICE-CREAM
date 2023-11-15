@@ -9,18 +9,15 @@ Created At: 2023-11-12, Created By: {rla1wo23}.
 class Set : public AVLTree
 {
 public:
-    Set()
-    {
+    Set() {
         tree = AVLTree();
     }
     void minimum(int X);
     void maximum(int X);
-    void empty()
-    {
+    void empty() {
         std::cout << tree.IsEmpty();
     }
-    void size()
-    {
+    void size() {
         std::cout << tree.Size();
     }
     void find(int x);

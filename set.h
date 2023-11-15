@@ -6,8 +6,7 @@ Created At: 2023-11-12, Created By: {rla1wo23}.
 #ifndef SET_H
 #define SET_H
 #include "avl_tree.h"
-class Set : public AVLTree
-{
+class Set : public AVLTree {
 public:
     Set() {
         tree = AVLTree();

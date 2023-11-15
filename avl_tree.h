@@ -7,7 +7,7 @@ Created At: 2023-11-12, Created By: {rla1wo23}.
 #define AVL_TREE_H
 #include <algorithm>
 #include <iostream>
-class Node{
+class Node {
 private:
     int key;
     int height = 0;
@@ -15,7 +15,7 @@ private:
     Node *right = nullptr;
     friend class AVLTree;
 };
-class AVLTree{
+class AVLTree {
 public:        // 자식 클래스에서 public함수를 통해서만 AVLTree에 접근할 수 있게끔 합니다.
     AVLTree(); // Rule of Three를 만족하게끔 1)복사생성자 2)소멸자를 적절히 추가해야 합니다.
     ~AVLTree();

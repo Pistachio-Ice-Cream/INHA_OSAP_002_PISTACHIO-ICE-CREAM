@@ -6,21 +6,17 @@ Created At: 2023-11-12, Created By: {rla1wo23}.
 #ifndef SET_H
 #define SET_H
 #include "avl_tree.h"
-class Set : public AVLTree
-{
+class Set : public AVLTree {
 public:
-    Set()
-    {
+    Set() {
         tree = AVLTree();
     }
     void minimum(int X);
     void maximum(int X);
-    void empty()
-    {
+    void empty() {
         std::cout << tree.IsEmpty();
     }
-    void size()
-    {
+    void size() {
         std::cout << tree.Size();
     }
     void find(int x);

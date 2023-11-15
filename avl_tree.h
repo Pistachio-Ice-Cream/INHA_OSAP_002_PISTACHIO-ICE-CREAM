@@ -36,8 +36,9 @@ protected:                              // protected부분은 자식 클래스�
     Node *LeftRotation(Node *old_axis); // 왼쪽 Roation을 수행합니다.
     Node *RightRotation(Node *old_axis);
     void AdjustBlance(Node *root, int target_key); // root노드와 어떤 키를 기준으로 밸런스를 맞출지 정의합니다.
-    Node *InsertNode(Node *iterator, int key_of_new_node);
+    Node *InsertNode(Node *iterator, int key_of_new_node); // 새로운 노드 생성 삽입, 밸런싱
     Node *EraseNode(Node *root_node, int key_of_target); // 노드를 삭제합니다.
+    int FindDepth(int find_target); // 해당 key를 가진 노드의 depth 리턴
 
 protected:
     int node_counter_ = 0;

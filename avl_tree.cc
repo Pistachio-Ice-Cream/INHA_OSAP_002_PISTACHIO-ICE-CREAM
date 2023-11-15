@@ -13,7 +13,10 @@ AVLTree::~AVLTree(){
 }
 bool AVLTree::IsEmpty() { return node_counter_ == 0; }
 int AVLTree::Size() { return node_counter_; }
-int AVLTree::Insert(int new_key){}
+int AVLTree::Insert(int new_key){
+    this->root_ =  InsertNode(this->root_, new_key);
+    return FindDepth(new_key);
+}
 int AVLTree::Find(int x) {}
 int AVLTree::Minimum(int x){
     Node *iterator = root_;
@@ -115,8 +118,37 @@ void AVLTree::AdjustBlance(Node *root, int target_key){ // root노드와 어떤 
     }
 }
 
-Node *AVLTree::InsertNode(Node *node, int value){
-    // Implementation for insertion
+Node *AVLTree::InsertNode(Node *iterator, int key_of_new_node){ // 새로운 노드 삽입
+        if (iterator == nullptr) // 현재 iterator위치가 비어있으면 삽입
+        {
+            Node* new_node = new Node;
+            new_node->key = key_of_new_node;
+            return new_node;
+        }
+        else if (iterator->key < key_of_new_node)
+        { // 새로운 key값이 현재 iterator의 key값보다 크면 오른쪽 이동
+            iterator->right = InsertNode(iterator->right, key_of_new_node);
+        }
+        else
+        { // 새로운 key값이 현재 iterator의 key값보다 크면 왼쪽 이동
+            iterator->left = InsertNode(iterator->left, key_of_new_node);
+        }
+        iterator->height = std::max(height(iterator->left), height(iterator->right)); // iterator의 높이 갱신
+        AdjustBlance(iterator, key_of_new_node); // iterator기준 밸런싱
+        
+        return iterator;
+}
+
+int AVLTree::FindDepth(int find_target)
+{
+    Node *iterator = root_;
+		int depth_counter=0;
+    while (iterator != nullptr && iterator->key != find_target)
+    {
+				depth_counter++;
+        iterator = (find_target < iterator->key) ? iterator->left : iterator->right;
+    }
+    return depth_counter;
 }
 
 Node *AVLTree::EraseNode(Node *root_node, int key_of_target){

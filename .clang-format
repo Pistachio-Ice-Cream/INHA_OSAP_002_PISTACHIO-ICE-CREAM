@@ -1,0 +1,12 @@
+---
+Language: Cpp
+BasedOnStyle: Google
+UseTab: Never
+SpacesBeforeTrailingComments: 1
+ColumnLimit: 80
+IndentWidth: 2
+AllowShortFunctionsOnASingleLine: None
+BreakBeforeBraces: Attach
+AccessModifierOffset: -1
+AllowShortBlocksOnASingleLine: Empty
+...

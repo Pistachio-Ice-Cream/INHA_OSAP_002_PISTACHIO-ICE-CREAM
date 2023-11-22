@@ -24,7 +24,7 @@ int AVLTree<value_type>::Size() {
 
 template <typename value_type>
 int AVLTree<value_type>::Minimum(value_type x) {
-  Node *iterator = FindNodePtr(x);
+  treeNode<value_type> *iterator = FindNodePtr(x);
   while (iterator->left != nullptr) {
     iterator = iterator->left;
   }
@@ -32,7 +32,7 @@ int AVLTree<value_type>::Minimum(value_type x) {
 }
 template <typename value_type>
 int AVLTree<value_type>::Maximum(value_type x) {
-  Node *iterator = FindNodePtr(x);
+  treeNode<value_type> *iterator = FindNodePtr(x);
   while (iterator->right != nullptr) {
     iterator = iterator->right;
   }
@@ -53,7 +53,7 @@ int AVLTree<value_type>::height(treeNode<value_type> *target_node) {
 /*protected members*/
 template <typename value_type>
 treeNode<value_type> *AVLTree<value_type>::FindNodePtr(value_type find_target) {
-  Node *iterator = root_;
+  treeNode<value_type> *iterator = root_;
   while (iterator != nullptr && iterator->key != find_target) {
     iterator = (find_target < iterator->key) ? iterator->left : iterator->right;
   }
@@ -67,7 +67,7 @@ int AVLTree<value_type>::CalculateBalance(treeNode<value_type> *target_node) {
 template <typename value_type>
 treeNode<value_type> *AVLTree<value_type>::LeftRotation(
     treeNode<value_type> *old_axis) { // 왼쪽 Roation을 수행합니다.
-  Node *new_axis = old_axis->right;
+  treeNode<value_type> *new_axis = old_axis->right;
   if (new_axis->left != nullptr) {
     old_axis->right = new_axis->left;
   } else {
@@ -84,7 +84,7 @@ treeNode<value_type> *AVLTree<value_type>::LeftRotation(
 template <typename value_type>
 treeNode<value_type> *AVLTree<value_type>::RightRotation(
     treeNode<value_type> *old_axis) {
-  Node *new_axis = old_axis->left;
+  treeNode<value_type> *new_axis = old_axis->left;
   if (new_axis->right != nullptr) {
     old_axis->left = new_axis->right;
   } else {
@@ -127,7 +127,7 @@ treeNode<value_type> *AVLTree<value_type>::InsertNode(
     treeNode<value_type> *iterator,
     value_type key_of_new_node) { // 새로운 노드 삽입
   if (iterator == nullptr) { // 현재 iterator위치가 비어있으면 삽입
-    Node *new_node = new Node;
+    treeNode<value_type> *new_node = new treeNode;
     this->node_counter_++;
     new_node->key = key_of_new_node;
     return new_node;
@@ -146,7 +146,7 @@ treeNode<value_type> *AVLTree<value_type>::InsertNode(
 
 template <typename value_type>
 int AVLTree<value_type>::FindDepth(value_type find_target) {
-  Node *iterator = root_;
+  treeNode<value_type> *iterator = root_;
   int depth_counter = 0;
   while (iterator != nullptr && iterator->key != find_target) {
     depth_counter++;

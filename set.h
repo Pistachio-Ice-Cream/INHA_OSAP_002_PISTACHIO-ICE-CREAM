@@ -39,4 +39,4 @@ class AVLSet : public Set {
   AVLTree<value_type> tree;
 };
 
-#endif // SET_H
+#endif

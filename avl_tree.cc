@@ -128,6 +128,7 @@ Node<value_type> *AVLTree<value_type>::InsertNode(
     value_type key_of_new_node) { // 새로운 노드 삽입
   if (iterator == nullptr) { // 현재 iterator위치가 비어있으면 삽입
     Node *new_node = new Node;
+    this->node_counter_++;
     new_node->key = key_of_new_node;
     return new_node;
   } else if (iterator->key <

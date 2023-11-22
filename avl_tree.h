@@ -10,15 +10,17 @@ Created At: 2023-11-12, Created By: {rla1wo23, rla1wo23@gmail.com}.
 
 template <typename value_type>
 class Node {
- public:
+ protected:
   value_type key;
-  value_type key() {
-    return key;
+
+ public:
+  value_type get_key() {
+    return this->key;
   }
 };
 template <typename value_type>
 class treeNode : public Node {
- public:
+ private:
   int height = 0;
   treeNode *left = nullptr;
   treeNode *right = nullptr;

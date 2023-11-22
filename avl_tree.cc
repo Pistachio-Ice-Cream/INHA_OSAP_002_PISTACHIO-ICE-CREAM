@@ -44,7 +44,7 @@ void AVLTree<value_type>::Rank(value_type x){};
 void Erase(int x) {
 }
 template <typename value_type>
-int AVLTree<value_type>::height(Node<value_type> *target_node) {
+int AVLTree<value_type>::height(treeNode<value_type> *target_node) {
   if (target_node == nullptr)
     return 0;
   else
@@ -52,7 +52,7 @@ int AVLTree<value_type>::height(Node<value_type> *target_node) {
 }
 /*protected members*/
 template <typename value_type>
-Node<value_type> *AVLTree<value_type>::FindNodePtr(value_type find_target) {
+treeNode<value_type> *AVLTree<value_type>::FindNodePtr(value_type find_target) {
   Node *iterator = root_;
   while (iterator != nullptr && iterator->key != find_target) {
     iterator = (find_target < iterator->key) ? iterator->left : iterator->right;
@@ -61,12 +61,12 @@ Node<value_type> *AVLTree<value_type>::FindNodePtr(value_type find_target) {
 }
 
 template <typename value_type>
-int AVLTree<value_type>::CalculateBalance(Node<value_type> *target_node) {
+int AVLTree<value_type>::CalculateBalance(treeNode<value_type> *target_node) {
   return target_node->left->height - target_node->right->height;
 }
 template <typename value_type>
-Node<value_type> *AVLTree<value_type>::LeftRotation(
-    Node<value_type> *old_axis) { // 왼쪽 Roation을 수행합니다.
+treeNode<value_type> *AVLTree<value_type>::LeftRotation(
+    treeNode<value_type> *old_axis) { // 왼쪽 Roation을 수행합니다.
   Node *new_axis = old_axis->right;
   if (new_axis->left != nullptr) {
     old_axis->right = new_axis->left;
@@ -82,8 +82,8 @@ Node<value_type> *AVLTree<value_type>::LeftRotation(
 }
 
 template <typename value_type>
-Node<value_type> *AVLTree<value_type>::RightRotation(
-    Node<value_type> *old_axis) {
+treeNode<value_type> *AVLTree<value_type>::RightRotation(
+    treeNode<value_type> *old_axis) {
   Node *new_axis = old_axis->left;
   if (new_axis->right != nullptr) {
     old_axis->left = new_axis->right;
@@ -100,7 +100,7 @@ Node<value_type> *AVLTree<value_type>::RightRotation(
 
 template <typename value_type>
 void AVLTree<value_type>::AdjustBlance(
-    Node<value_type> *root,
+    treeNode<value_type> *root,
     value_type target_key) { // root노드와 어떤 키를 기준으로
   // 밸런스를 맞출지 정의합니다.
   int balance_factor = CalculateBalance(root);
@@ -123,8 +123,8 @@ void AVLTree<value_type>::AdjustBlance(
 }
 
 template <typename value_type>
-Node<value_type> *AVLTree<value_type>::InsertNode(
-    Node<value_type> *iterator,
+treeNode<value_type> *AVLTree<value_type>::InsertNode(
+    treeNode<value_type> *iterator,
     value_type key_of_new_node) { // 새로운 노드 삽입
   if (iterator == nullptr) { // 현재 iterator위치가 비어있으면 삽입
     Node *new_node = new Node;
@@ -156,7 +156,7 @@ int AVLTree<value_type>::FindDepth(value_type find_target) {
 }
 
 template <typename value_type>
-Node<value_type> *AVLTree<value_type>::EraseNode(Node<value_type> *root_node,
-                                                 value_type key_of_target) {
+treeNode<value_type> *AVLTree<value_type>::EraseNode(
+    treeNode<value_type> *root_node, value_type key_of_target) {
   // Implementation for Erase
 }

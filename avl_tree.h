@@ -33,26 +33,26 @@ class AVLTree {
   ~AVLTree();
   bool IsEmpty();
   int Size();
-  Node<value_type> *InsertNode(Node<value_type> *iterator,
-                               value_type key_of_new_node);
-  Node<value_type> *EraseNode(Node<value_type> *root_node,
-                              value_type key_of_target);
-  Node<value_type> *FindNodePtr(value_type find_target);
+  treeNode<value_type> *InsertNode(treeNode<value_type> *iterator,
+                                   value_type key_of_new_node);
+  treeNode<value_type> *EraseNode(treeNode<value_type> *root_node,
+                                  value_type key_of_target);
+  treeNode<value_type> *FindNodePtr(value_type find_target);
   int Minimum(value_type x);
   int Maximum(value_type x);
   void Rank(value_type x);
   void Erase(value_type x);
-  int height(Node<value_type> *target_node);
+  int height(treeNode<value_type> *target_node);
 
  protected:
-  int CalculateBalance(Node<value_type> *target_node);
-  Node<value_type> *LeftRotation(Node<value_type> *old_axis);
-  Node<value_type> *RightRotation(Node<value_type> *old_axis);
-  void AdjustBlance(Node<value_type> *root, value_type target_key);
+  int CalculateBalance(treeNode<value_type> *target_node);
+  treeNode<value_type> *LeftRotation(treeNode<value_type> *old_axis);
+  treeNode<value_type> *RightRotation(treeNode<value_type> *old_axis);
+  void AdjustBlance(treeNode<value_type> *root, value_type target_key);
   int FindDepth(value_type find_target);
 
  protected:
   int node_counter_ = 0;
-  Node<value_type> *root_;
+  treeNode<value_type> *root_;
 };
 #endif // AVL_TREE_H

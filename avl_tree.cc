@@ -29,7 +29,7 @@ int AVLTree<value_type>::Minimum(value_type x) {
     iterator = iterator->left;
   }
   return iterator->key;
-};
+}
 template <typename value_type>
 int AVLTree<value_type>::Maximum(value_type x) {
   Node *iterator = FindNodePtr(x);
@@ -37,7 +37,7 @@ int AVLTree<value_type>::Maximum(value_type x) {
     iterator = iterator->right;
   }
   return iterator->key;
-};
+}
 
 template <typename value_type>
 void AVLTree<value_type>::Rank(value_type x){};

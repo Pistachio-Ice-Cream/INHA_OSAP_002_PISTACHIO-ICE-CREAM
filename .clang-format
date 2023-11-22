@@ -9,4 +9,3 @@ AllowShortFunctionsOnASingleLine: None
 BreakBeforeBraces: Attach
 AccessModifierOffset: -1
 AllowShortBlocksOnASingleLine: Empty
-...

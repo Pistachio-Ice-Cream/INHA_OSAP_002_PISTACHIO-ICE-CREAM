@@ -6,25 +6,37 @@ Created At: 2023-11-12, Created By: {rla1wo23}.
 #ifndef SET_H
 #define SET_H
 #include "avl_tree.h"
-class Set : public AVLTree {
-public:
-    Set() {
-        tree = AVLTree();
-    }
-    void minimum(int X);
-    void maximum(int X);
-    void empty() {
-        std::cout << tree.IsEmpty();
-    }
-    void size() {
-        std::cout << tree.Size();
-    }
-    void find(int x);
-    void insert(int x);
-    void rank(int x);
-    void erase(int x);
-
-private:
-    AVLTree tree;
+template <typename value_type>
+class Set {
+ public:
+  virtual void Minimum(value_type x);
+  virtual void Maximum(value_type x);
+  virtual void Empty();
+  virtual void Size();
+  virtual void Find(value_type x);
+  virtual void Insert(value_type x);
+  virtual void Rank(value_type x);
+  virtual void Erase(value_type x);
 };
-#endif // SET_H
+
+template <typename value_type>
+class AVLSet : public Set {
+ public:
+  AVLSet() {
+    tree = AVLTree<value_type>();
+  };
+  ~AVLSet();
+  void Minimum(value_type x);
+  void Maximum(value_type x);
+  void Empty();
+  void Size();
+  void Find(value_type x);
+  void Insert(value_type x);
+  void Rank(value_type x);
+  void Erase(value_type x);
+
+ private:
+  AVLTree<value_type> tree;
+};
+
+#endif

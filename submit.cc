@@ -189,8 +189,6 @@ class AVLTree {
       axis = LLRotation(axis);
     }
   };
-  // 포인터 변수 참조로 변경했습니다.
-  // parent변수는 고려되지 않은 코드입니다
 
  protected:
   int node_counter_ = 0;
@@ -207,8 +205,6 @@ class Set {
   void Size(){};
   void Find(value_type x){};
   void Insert(value_type x){};
-  // virtual void Rank(value_type x)=0;
-  // virtual void Erase(value_type x)=0;
 };
 
 template <typename value_type>

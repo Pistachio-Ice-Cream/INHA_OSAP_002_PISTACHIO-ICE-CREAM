@@ -9,7 +9,7 @@ Created At: 2023-11-12, Created By: {rla1wo23, rla1wo23@gmail.com}.
 #include <iostream>
 
 template <typename value_type>
-class treeNode {
+class Node {
  public:
   value_type get_key() {
     return this->key;

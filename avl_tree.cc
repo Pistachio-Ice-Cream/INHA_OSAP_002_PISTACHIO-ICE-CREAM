@@ -65,7 +65,7 @@ int AVLTree<value_type>::CalculateBalance(treeNode<value_type> *target_node) {
   return target_node->left->height - target_node->right->height;
 }
 template <typename value_type>
-treeNode<value_type> *AVLTree<value_type>::LeftRotation(
+treeNode<value_type> *AVLTree<value_type>::LLRotation(
     treeNode<value_type> *old_axis) { // 왼쪽 Roation을 수행합니다.
   treeNode<value_type> *new_axis = old_axis->right;
   if (new_axis->left != nullptr) {
@@ -82,7 +82,7 @@ treeNode<value_type> *AVLTree<value_type>::LeftRotation(
 }
 
 template <typename value_type>
-treeNode<value_type> *AVLTree<value_type>::RightRotation(
+treeNode<value_type> *AVLTree<value_type>::RRRotation(
     treeNode<value_type> *old_axis) {
   treeNode<value_type> *new_axis = old_axis->left;
   if (new_axis->right != nullptr) {
@@ -110,15 +110,15 @@ void AVLTree<value_type>::AdjustBlance(
   }
   if (balance_factor > 1 &&
       target_key < root->left->key) { // 왼쪽이 더 큰 트리, ll의 경우
-    root = RightRotation(root);
+    root = RRRotation(root);
   } else if (balance_factor > 1 && target_key > root->left->key) { // lr상황
-    root->left = LeftRotation(root->left);
-    root = RightRotation(root);
+    root->left = LLRotation(root->left);
+    root = RRRotation(root);
   } else if (balance_factor < -1 && target_key > root->right->key) { // rr상황
-    root = LeftRotation(root);
+    root = LLRotation(root);
   } else if (balance_factor < -1 && target_key < root->right->key) { // rl상황
-    root->right = RightRotation(root->right);
-    root = LeftRotation(root);
+    root->right = RRRotation(root->right);
+    root = LLRotation(root);
   }
 }
 

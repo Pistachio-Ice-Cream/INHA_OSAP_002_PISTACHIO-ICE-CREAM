@@ -50,9 +50,7 @@ class AVLTree {
   treeNode<value_type>* root() {
     return root_;
   }
-  AVLTree() {
-    root_ = new treeNode<value_type>;
-  };
+  AVLTree() : root_(new treeNode<value_type>){};
   ~AVLTree(){
 
   };
@@ -210,9 +208,7 @@ class Set {
 template <typename value_type>
 class AVLSet : public Set<value_type> {
  public:
-  AVLSet() {
-    tree = AVLTree<value_type>();
-  };
+  AVLSet() : tree(AVLTree<value_type>()){};
   ~AVLSet() {
     tree.~AVLTree();
   };

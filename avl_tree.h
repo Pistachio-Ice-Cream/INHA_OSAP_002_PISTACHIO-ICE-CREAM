@@ -46,8 +46,8 @@ class AVLTree {
 
  protected:
   int CalculateBalance(treeNode<value_type> *target_node);
-  treeNode<value_type> *LeftRotation(treeNode<value_type> *old_axis);
-  treeNode<value_type> *RightRotation(treeNode<value_type> *old_axis);
+  treeNode<value_type> *LLRotation(treeNode<value_type> *old_axis);
+  treeNode<value_type> *RRRotation(treeNode<value_type> *old_axis);
   void AdjustBlance(treeNode<value_type> *root, value_type target_key);
   int FindDepth(value_type find_target);
 

@@ -4,12 +4,15 @@
 template <typename value_type>
 class Node {
  public:
-  value_type get_key() {
-    return this->key;
+  value_type key() const {
+    return this->key_;
+  }
+  void set_key(value_type new_key) {
+    key_ = new_key;
   }
 
  protected:
-  value_type key;
+  value_type key_;
 };
 // clean
 template <typename value_type>
@@ -50,7 +53,9 @@ class AVLTree {
   treeNode<value_type>* root() {
     return root_;
   }
-  AVLTree() : root_(new treeNode<value_type>){};
+  AVLTree() {
+    root_ = new treeNode<value_type>;
+  };
   ~AVLTree(){
 
   };
@@ -64,7 +69,7 @@ class AVLTree {
                                    value_type key_of_new_node) {
     if (IsEmpty()) {
       root_ = new treeNode<value_type>;
-      root_->key = key_of_new_node;
+      root_->set_key(key_of_new_node);
       this->node_counter_++;
       return root_;
     }
@@ -72,9 +77,9 @@ class AVLTree {
       treeNode<value_type>* new_node = new treeNode<value_type>;
       this->node_counter_++;
       iterator = new_node; // 추가된 부분
-      new_node->key = key_of_new_node;
+      new_node->set_key(key_of_new_node);
       return new_node;
-    } else if (iterator->key < key_of_new_node) {
+    } else if (iterator->key() < key_of_new_node) {
       iterator->right = InsertNode(iterator->right, key_of_new_node);
       // iterator->right->parent = iterator;
     } else {
@@ -91,9 +96,9 @@ class AVLTree {
                                   value_type key_of_target);
   treeNode<value_type>* FindNodePtr(value_type find_target) {
     treeNode<value_type>* iterator = root_;
-    while (iterator != nullptr && iterator->key != find_target) {
+    while (iterator != nullptr && iterator->key() != find_target) {
       iterator =
-          (find_target < iterator->key) ? iterator->left : iterator->right;
+          (find_target < iterator->key()) ? iterator->left : iterator->right;
     }
     if (iterator == nullptr) {
       return nullptr;
@@ -126,10 +131,10 @@ class AVLTree {
   int FindDepth(value_type find_target) {
     treeNode<value_type>* iterator = root_;
     int depth_counter = 0;
-    while (iterator != nullptr && iterator->key != find_target) {
+    while (iterator != nullptr && iterator->key() != find_target) {
       depth_counter++;
       iterator =
-          (find_target < iterator->key) ? iterator->left : iterator->right;
+          (find_target < iterator->key()) ? iterator->left : iterator->right;
     }
     return depth_counter;
   };
@@ -175,14 +180,16 @@ class AVLTree {
     if (balance_factor == -1 || balance_factor == 0 || balance_factor == 1) {
       return;
     }
-    if (balance_factor > 1 && target_key < axis->left->key) { // ll상황
+    if (balance_factor > 1 && target_key < axis->left->key()) { // ll상황
       axis = RRRotation(axis);
-    } else if (balance_factor > 1 && target_key > axis->left->key) { // lr상황
+    } else if (balance_factor > 1 && target_key > axis->left->key()) { // lr상황
       axis->left = LLRotation(axis->left);
       axis = RRRotation(axis);
-    } else if (balance_factor < -1 && target_key > axis->right->key) { // rr상황
+    } else if (balance_factor < -1 &&
+               target_key > axis->right->key()) { // rr상황
       axis = LLRotation(axis);
-    } else if (balance_factor < -1 && target_key < axis->right->key) { // rl상황
+    } else if (balance_factor < -1 &&
+               target_key < axis->right->key()) { // rl상황
       axis->right = RRRotation(axis->right);
       axis = LLRotation(axis);
     }
@@ -208,7 +215,9 @@ class Set {
 template <typename value_type>
 class AVLSet : public Set<value_type> {
  public:
-  AVLSet() : tree(AVLTree<value_type>()){};
+  AVLSet() {
+    tree = AVLTree<value_type>();
+  };
   ~AVLSet() {
     tree.~AVLTree();
   };
@@ -217,8 +226,7 @@ class AVLSet : public Set<value_type> {
       return;
     } else {
       treeNode<value_type>* tmp = tree.Minimum(x);
-      std::cout << tmp->get_key() << " " << tree.FindDepth(tmp->get_key())
-                << "\n";
+      std::cout << tmp->key() << " " << tree.FindDepth(tmp->key()) << "\n";
     }
   };
   void Maximum(value_type x) {
@@ -226,8 +234,7 @@ class AVLSet : public Set<value_type> {
       return;
     } else {
       treeNode<value_type>* tmp = tree.Maximum(x);
-      std::cout << tmp->get_key() << " " << tree.FindDepth(tmp->get_key())
-                << "\n";
+      std::cout << tmp->key() << " " << tree.FindDepth(tmp->key()) << "\n";
     }
   };
   void Empty() {

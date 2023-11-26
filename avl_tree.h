@@ -11,24 +11,59 @@ Created At: 2023-11-12, Created By: {rla1wo23, rla1wo23@gmail.com}.
 template <typename value_type>
 class Node {
  public:
-  value_type key() {
+  value_type key() const {
     return this->key_;
+  }
+  void set_key(value_type new_key) {
+    key_ = new_key;
   }
 
  protected:
   value_type key_;
 };
 template <typename value_type>
-class TreeNode : public Node {
- private:
-  int height_ = 0;
+class AVLTree;
+
+template <typename value_type>
+class TreeNode : public Node<value_type> {
+ public:
+  int height() const {
+    return height_;
+  }
+  void set_height(int new_height) {
+    height_ = new_height;
+  }
+  void Balancing() {
+    int height_of_left = 0, height_of_right = 0;
+    bool is_root = true;
+    if (left_ != nullptr) {
+      height_of_left = left_->height();
+      is_root = false;
+    }
+    if (right_ != nullptr) {
+      height_of_right = right_->height();
+      is_root = false;
+    }
+    if (is_root == true) {
+      set_height(0);
+    } else {
+      set_height(std::max(height_of_left, height_of_right) + 1);
+    }
+  }
+
+ public:
   TreeNode *left_ = nullptr;
   TreeNode *right_ = nullptr;
-  friend class AVLTree;
+  friend class AVLTree<value_type>;
+
+ private:
+  int height_ = 0;
 };
+
 template <typename value_type>
 class AVLTree {
  public:
+  TreeNode<value_type> *root();
   AVLTree();
   ~AVLTree();
   bool IsEmpty();

@@ -63,6 +63,9 @@ class AVLTree {
   AVLTree() {
     root_ = new TreeNode<value_type>;
   };
+  AVLTree(const AVLTree& copy_target) {
+    root_ = copyTree(copy_target.root());
+  }
   ~AVLTree(){
 
   };
@@ -211,6 +214,19 @@ class AVLTree {
  protected:
   int node_counter_ = 0;
   TreeNode<value_type>* root_;
+  TreeNode<value_type>* copyTree(const TreeNode<value_type>* node) {
+    if (node == nullptr) {
+      return nullptr;
+    }
+
+    TreeNode<value_type>* new_node = new TreeNode<value_type>;
+    new_node->set_key(node->key());
+    new_node->left_ = copyTree(node->left_);
+    new_node->right_ = copyTree(node->right_);
+    new_node->set_height(node->height());
+
+    return new_node;
+  }
 };
 template <typename value_type>
 class Set {

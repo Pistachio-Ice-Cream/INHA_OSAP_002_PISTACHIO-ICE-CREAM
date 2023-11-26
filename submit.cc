@@ -21,30 +21,38 @@ class AVLTree;
 template <typename value_type>
 class treeNode : public Node<value_type> {
  public:
+  int height() const {
+    return height_;
+  }
+  void set_height(int new_height) {
+    height_ = new_height;
+  }
   void Balancing() {
-    int l_height = 0, r_height = 0;
-    int is_root = 0;
+    int height_of_left = 0, height_of_right = 0;
+    bool is_root = true;
     if (left != nullptr) {
-      l_height = left->height;
-      is_root++;
+      height_of_left = left->height();
+      is_root = false;
     }
     if (right != nullptr) {
-      r_height = right->height;
-      is_root++;
+      height_of_right = right->height();
+      is_root = false;
     }
-    if (is_root == 0) {
-      height = 0;
+    if (is_root == true) {
+      set_height(0);
     } else {
-      height = std::max(l_height, r_height) + 1;
+      set_height(std::max(height_of_left, height_of_right) + 1);
     }
   }
 
  public:
-  int height = 0;
   treeNode* left = nullptr;
   treeNode* right = nullptr;
   treeNode* parent = nullptr;
   friend class AVLTree<value_type>;
+
+ private:
+  int height_ = 0;
 };
 // clean
 template <typename value_type>
@@ -86,8 +94,9 @@ class AVLTree {
       iterator->left = InsertNode(iterator->left, key_of_new_node);
       // iterator->left->parent = iterator;
     }
-    iterator->height =
-        (std::max(NodeHeight(iterator->left), NodeHeight(iterator->right))) + 1;
+    iterator->set_height(
+        (std::max(NodeHeight(iterator->left), NodeHeight(iterator->right))) +
+        1);
     AdjustBlance(iterator, key_of_new_node);
     return iterator;
   };
@@ -126,7 +135,7 @@ class AVLTree {
     if (target_node == nullptr) {
       return -1;
     }
-    return target_node->height;
+    return target_node->height();
   };
   int FindDepth(value_type find_target) {
     treeNode<value_type>* iterator = root_;
@@ -152,10 +161,10 @@ class AVLTree {
     if (old_axis == root_) {
       root_ = new_axis;
     }
-    old_axis->height =
-        std::max(NodeHeight(old_axis->left), NodeHeight(old_axis->right)) + 1;
-    new_axis->height =
-        std::max(NodeHeight(new_axis->left), NodeHeight(new_axis->right)) + 1;
+    old_axis->set_height(
+        std::max(NodeHeight(old_axis->left), NodeHeight(old_axis->right)) + 1);
+    new_axis->set_height(
+        std::max(NodeHeight(new_axis->left), NodeHeight(new_axis->right)) + 1);
     return new_axis;
   }
 
@@ -167,10 +176,10 @@ class AVLTree {
       root_ = new_axis;
     }
 
-    old_axis->height =
-        std::max(NodeHeight(old_axis->left), NodeHeight(old_axis->right)) + 1;
-    new_axis->height =
-        std::max(NodeHeight(new_axis->left), NodeHeight(new_axis->right)) + 1;
+    old_axis->set_height(
+        std::max(NodeHeight(old_axis->left), NodeHeight(old_axis->right)) + 1);
+    new_axis->set_height(
+        std::max(NodeHeight(new_axis->left), NodeHeight(new_axis->right)) + 1);
     return new_axis;
   }
   // 주석은 기존 코드입니다.

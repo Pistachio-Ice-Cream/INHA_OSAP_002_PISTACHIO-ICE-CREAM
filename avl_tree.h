@@ -52,7 +52,7 @@ class AVLTree {
   TreeNode<value_type>* Maximum(value_type x);
   void Rank(value_type x);
   void Erase(value_type x);
-  int NodeHeight(TreeNode<value_type>* target_node);
+  int NodeHeight(TreeNode<value_type>* target_node) const;
   int FindDepth(value_type find_target);
 
  protected:

@@ -126,97 +126,73 @@ void AVLTree<value_type>::Rank(value_type x){};
 void Erase(int x) {
 }
 template <typename value_type>
-int AVLTree<value_type>::height(TreeNode<value_type> *target_node) {
-  if (target_node == nullptr)
-    return 0;
-  else
-    return target_node->height_;
+int AVLTree<value_type>::NodeHeight(TreeNode<value_type> *target_node) const {
+  if (target_node == nullptr) {
+    return -1;
+  }
+  return target_node->height();
 }
 /*protected members*/
 
 template <typename value_type>
 int AVLTree<value_type>::CalculateBalance(TreeNode<value_type> *target_node) {
-  return target_node->left_->height_ - target_node->right_->height_;
+  return NodeHeight(target_node->left_) - NodeHeight(target_node->right_);
 }
 template <typename value_type>
 TreeNode<value_type> *AVLTree<value_type>::LLRotation(
-    TreeNode<value_type> *old_axis) { // 왼쪽 Roation을 수행합니다.
+    TreeNode<value_type> *&old_axis) {
   TreeNode<value_type> *new_axis = old_axis->right_;
-  if (new_axis->left_ != nullptr) {
-    old_axis->right_ = new_axis->left_;
-  } else {
-    old_axis->right_ = nullptr;
-  }
+  old_axis->right_ = new_axis->left_;
   new_axis->left_ = old_axis;
-  old_axis->height_ =
-      std::max(height(old_axis->left_), height(old_axis->right_)) + 1;
-  new_axis->height_ =
-      std::max(height(new_axis->left_), height(new_axis->right_)) + 1;
+
+  if (old_axis == root_) {
+    root_ = new_axis;
+  }
+  old_axis->set_height(
+      std::max(NodeHeight(old_axis->left_), NodeHeight(old_axis->right_)) + 1);
+  new_axis->set_height(
+      std::max(NodeHeight(new_axis->left_), NodeHeight(new_axis->right_)) + 1);
   return new_axis;
 }
 
 template <typename value_type>
 TreeNode<value_type> *AVLTree<value_type>::RRRotation(
-    TreeNode<value_type> *old_axis) {
+    TreeNode<value_type> *&old_axis) {
   TreeNode<value_type> *new_axis = old_axis->left_;
-  if (new_axis->right_ != nullptr) {
-    old_axis->left_ = new_axis->right_;
-  } else {
-    old_axis->left_ = nullptr;
-  }
+  old_axis->left_ = new_axis->right_;
   new_axis->right_ = old_axis;
-  old_axis->height_ =
-      std::max(height(old_axis->left_), height(old_axis->right_)) + 1;
-  new_axis->height_ =
-      std::max(height(new_axis->left_), height(new_axis->right_)) + 1;
+  if (old_axis == root_) {
+    root_ = new_axis;
+  }
+
+  old_axis->set_height(
+      std::max(NodeHeight(old_axis->left_), NodeHeight(old_axis->right_)) + 1);
+  new_axis->set_height(
+      std::max(NodeHeight(new_axis->left_), NodeHeight(new_axis->right_)) + 1);
   return new_axis;
 }
 
 template <typename value_type>
 void AVLTree<value_type>::AdjustBlance(
-    TreeNode<value_type> *root,
-    value_type target_key) { // root노드와 어떤 키를 기준으로
-  // 밸런스를 맞출지 정의합니다.
-  int balance_factor = CalculateBalance(root);
-  if (balance_factor == -1 || balance_factor == 0 ||
-      balance_factor == 1) { // 균형이 맞음, 밸런스 조정필요 없음
+    TreeNode<value_type> *&axis,
+    value_type &target_key) { // root노드와 어떤 키를 기준으로
+  int balance_factor = CalculateBalance(axis);
+  if (balance_factor == -1 || balance_factor == 0 || balance_factor == 1) {
     return;
   }
-  if (balance_factor > 1 &&
-      target_key < root->left_->key) { // 왼쪽이 더 큰 트리, ll의 경우
-    root = RRRotation(root);
-  } else if (balance_factor > 1 && target_key > root->left_->key) { // lr상황
-    root->left_ = LLRotation(root->left_);
-    root = RRRotation(root);
-  } else if (balance_factor < -1 && target_key > root->right_->key) { // rr상황
-    root = LLRotation(root);
-  } else if (balance_factor < -1 && target_key < root->right_->key) { // rl상황
-    root->right_ = RRRotation(root->right_);
-    root = LLRotation(root);
+  if (balance_factor > 1 && target_key < axis->left_->key()) { // ll상황
+    axis = RRRotation(axis);
+  } else if (balance_factor > 1 && target_key > axis->left_->key()) { // lr상황
+    axis->left_ = LLRotation(axis->left_);
+    axis = RRRotation(axis);
+  } else if (balance_factor < -1 &&
+             target_key > axis->right_->key()) { // rr상황
+    axis = LLRotation(axis);
+  } else if (balance_factor < -1 &&
+             target_key < axis->right_->key()) { // rl상황
+    axis->right_ = RRRotation(axis->right_);
+    axis = LLRotation(axis);
   }
-}
-
-template <typename value_type>
-TreeNode<value_type> *AVLTree<value_type>::InsertNode(
-    TreeNode<value_type> *iterator,
-    value_type key_of_new_node) { // 새로운 노드 삽입
-  if (iterator == nullptr) { // 현재 iterator위치가 비어있으면 삽입
-    TreeNode<value_type> *new_node = new treeNode;
-    this->node_counter_++;
-    new_node->key = key_of_new_node;
-    return new_node;
-  } else if (iterator->key <
-             key_of_new_node) { // 새로운 key값이 현재 iterator의 key값보다
-    // 크면 오른쪽 이동
-    iterator->right_ = InsertNode(iterator->right_, key_of_new_node);
-  } else { // 새로운 key값이 현재 iterator의 key값보다 크면 왼쪽 이동
-    iterator->left_ = InsertNode(iterator->left_, key_of_new_node);
-  }
-  iterator->height_ =
-      std::max(height(iterator->left_),
-               height(iterator->right_));  // iterator의 높이 갱신
-  AdjustBlance(iterator, key_of_new_node); // iterator기준 밸런싱
-  return iterator;
 }
 
 template <typename value_type>
@@ -235,4 +211,19 @@ template <typename value_type>
 TreeNode<value_type> *AVLTree<value_type>::EraseNode(
     TreeNode<value_type> *root_node, value_type key_of_target) {
   // Implementation for Erase
+}
+template <typename value_type>
+TreeNode<value_type> *AVLTree<value_type>::CopyTree(
+    const TreeNode<value_type> *node) {
+  if (node == nullptr) {
+    return nullptr;
+  }
+
+  TreeNode<value_type> *new_node = new TreeNode<value_type>;
+  new_node->set_key(node->key());
+  new_node->left_ = CopyTree(node->left_);
+  new_node->right_ = CopyTree(node->right_);
+  new_node->set_height(node->height());
+
+  return new_node;
 }

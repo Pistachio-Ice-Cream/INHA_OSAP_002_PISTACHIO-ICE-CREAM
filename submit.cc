@@ -132,7 +132,7 @@ class AVLTree {
   }
   void Rank(value_type x);
   void Erase(value_type x);
-  int NodeHeight(TreeNode<value_type>* target_node) {
+  int NodeHeight(TreeNode<value_type>* target_node) const {
     if (target_node == nullptr) {
       return -1;
     }

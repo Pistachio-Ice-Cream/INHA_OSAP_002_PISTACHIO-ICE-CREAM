@@ -103,11 +103,7 @@ class AVLTree {
       iterator =
           (find_target < iterator->key()) ? iterator->left_ : iterator->right_;
     }
-    if (iterator == nullptr) {
-      return nullptr;
-    } else {
-      return iterator;
-    }
+    return iterator;
   }
   TreeNode<value_type>* Minimum(value_type x) {
     TreeNode<value_type>* iterator = FindNodePtr(x);

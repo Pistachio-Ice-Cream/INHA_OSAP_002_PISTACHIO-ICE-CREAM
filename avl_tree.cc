@@ -40,7 +40,7 @@ void TreeNode<value_type>::Balancing() { // 자식 노드들로부터 본인의 
   if (right_ != nullptr) {
     height_of_right = right_->height();
   }
-  set_height(std::max(height_of_left, height_of_right) + 1);
+  set_height(std::max(height_of_left, height_of_right) + 1); // height의 정의
 }
 /*TreeNode Class Functions end*/
 
@@ -58,7 +58,7 @@ AVLTree<value_type>::AVLTree(const AVLTree &copy_target) {
   root_ = CopyTree(copy_target.root());
 }
 template <typename value_type>
-AVLTree<value_type>::~AVLTree() { // 소멸자 구현
+AVLTree<value_type>::~AVLTree() { // 소멸자 구현은 추후에
 }
 template <typename value_type>
 bool AVLTree<value_type>::IsEmpty() {
@@ -72,37 +72,53 @@ int AVLTree<value_type>::Size() {
 template <typename value_type>
 TreeNode<value_type> *AVLTree<value_type>::InsertNode(
     TreeNode<value_type> *iterator, value_type key_of_new_node) {
+  /*
+  노드 삽입 및 이에 따른 후처리 작업 함수
+  iterator를 이 노드가 삽입돼야 할 위치로 이동시킨 후,
+  있어야 할 빈 공간을 찾으면 해당 위치에 새로운 노드를 생성합니다.
+  재귀적으로 부모 노드는 새로운 노드를 자식 노드로 포인팅합니다.
+  */
   if (IsEmpty()) {
+    // 만약 빈 트리라면, 루트 노드를 생성하고 바로 리턴합니다.
     root_ = new TreeNode<value_type>;
     root_->set_key(key_of_new_node);
     this->node_counter_++;
     return root_;
   }
   if (iterator == nullptr) {
+    // iterator가 있어야 할 위치의 빈 공간을 찾았습니다.
+    // 해당 위치에 새로운 노드를 추가합니다.
     TreeNode<value_type> *new_node = new TreeNode<value_type>;
     this->node_counter_++;
     iterator = new_node; // 추가된 부분
     new_node->set_key(key_of_new_node);
     return new_node;
   } else if (iterator->key() < key_of_new_node) {
+    // 빈 공간을 못 찾았고, 만약 새로운 노드가 부모 노드보다 작다면 왼쪽으로,
+    //  크다면 오른쪽으로 iterator를 이동시킵니다.
     iterator->right_ = InsertNode(iterator->right_, key_of_new_node);
-    // iterator->right->parent = iterator;
   } else {
     iterator->left_ = InsertNode(iterator->left_, key_of_new_node);
-    // iterator->left->parent = iterator;
   }
+  // 새로운 노드를 삽입하는 재귀적 과정이 끝납니다.
   iterator->set_height(
       (std::max(NodeHeight(iterator->left_), NodeHeight(iterator->right_))) +
       1);
+  /*재귀적으로 자식 노드들로부터 Height를 계산해줍니다.
+  새로 추가한 노드부터 리턴되며 재귀적으로 Height를 계산하게 될 것입니다.*/
   AdjustBlance(iterator, key_of_new_node);
+  // 삽입 과정을 마친 후 밸런스 조정 함수로 넘어갑니다.
   return iterator;
 }
 template <typename value_type>
 TreeNode<value_type> *AVLTree<value_type>::FindNodePtr(value_type find_target) {
-  TreeNode<value_type> *iterator = root_;
+  // 원하는 키를 가진 노드의 포인터를 반환합니다.
+  TreeNode<value_type> *iterator = root_; // root부터 이분탐색 시작
   while (iterator != nullptr && iterator->key() != find_target) {
     iterator =
         (find_target < iterator->key()) ? iterator->left_ : iterator->right_;
+    /*작다면 왼쪽으로, 크다면 오른쪽으로 iterator 이동.
+    만약 키와 같다면, 거기서 탐색 종료*/
   }
   if (iterator == nullptr) {
     return nullptr;

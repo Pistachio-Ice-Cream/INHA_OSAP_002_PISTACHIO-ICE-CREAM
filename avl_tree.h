@@ -22,6 +22,7 @@ class AVLTree;
 
 template <typename value_type>
 class TreeNode : public Node<value_type> {
+  // Tree에서는 Node로 해당 클래스를 사용하도록 함.
  public:
   int height() const;
   void set_height(int new_height);
@@ -39,7 +40,7 @@ class TreeNode : public Node<value_type> {
 template <typename value_type>
 class AVLTree {
  public:
-  TreeNode<value_type>* root() const;
+  TreeNode<value_type>* root() const; // root_ getter 메소드
   AVLTree();
   AVLTree(const AVLTree& copy_target);
   ~AVLTree();

@@ -4,6 +4,12 @@ Distributed under the MIT License (http://opensource.org/licenses/MIT).
 Created At: 2023-11-12, Created By: {rla1wo23, rla1wo23@gmail.com}.
 */
 #include "avl_tree.h"
+/*
+함수의 구현부입니다.
+getter와 setter는 주석을 생략함.
+*/
+
+/*Node Class Functions start*/
 template <typename value_type>
 value_type Node<value_type>::key() const {
   return key_;
@@ -13,6 +19,9 @@ template <typename value_type>
 void Node<value_type>::set_key(value_type new_key) {
   key_ = new_key;
 }
+/*Node Class Functions end*/
+
+/*TreeNode Class Functions start*/
 template <typename value_type>
 int TreeNode<value_type>::height() const {
   return height_;
@@ -22,23 +31,20 @@ void TreeNode<value_type>::set_height(int new_height) {
   height_ = new_height;
 }
 template <typename value_type>
-void TreeNode<value_type>::Balancing() {
-  int height_of_left = 0, height_of_right = 0;
-  bool is_root = true;
+void TreeNode<value_type>::Balancing() { // 자식 노드들로부터 본인의 height를
+                                         // 계산 후 조정합니다.
+  int height_of_left = -1, height_of_right = -1;
   if (left_ != nullptr) {
     height_of_left = left_->height();
-    is_root = false;
   }
   if (right_ != nullptr) {
     height_of_right = right_->height();
-    is_root = false;
   }
-  if (is_root == true) {
-    set_height(0);
-  } else {
-    set_height(std::max(height_of_left, height_of_right) + 1);
-  }
+  set_height(std::max(height_of_left, height_of_right) + 1);
 }
+/*TreeNode Class Functions end*/
+
+/*AVLTree Class Functions start*/
 template <typename value_type>
 TreeNode<value_type> *AVLTree<value_type>::root() const {
   return root_;

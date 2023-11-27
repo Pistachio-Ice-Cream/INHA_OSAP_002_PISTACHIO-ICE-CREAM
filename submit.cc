@@ -28,21 +28,14 @@ class TreeNode : public Node<value_type> {
     height_ = new_height;
   }
   void Balancing() {
-    int height_of_left = 0, height_of_right = 0;
-    bool is_root = true;
+    int height_of_left = -1, height_of_right = -1;
     if (left_ != nullptr) {
       height_of_left = left_->height();
-      is_root = false;
     }
     if (right_ != nullptr) {
       height_of_right = right_->height();
-      is_root = false;
     }
-    if (is_root == true) {
-      set_height(0);
-    } else {
-      set_height(std::max(height_of_left, height_of_right) + 1);
-    }
+    set_height(std::max(height_of_left, height_of_right) + 1);
   }
 
  public:

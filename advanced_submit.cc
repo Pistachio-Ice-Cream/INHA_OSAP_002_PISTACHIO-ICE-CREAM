@@ -4,53 +4,53 @@
 template <typename value_type>
 class Node {
  public:
-  value_type get_key() {
-    return this->key;
+  value_type key() {
+    return this->key_;
   }
 
  protected:
-  value_type key;
+  value_type key_;
 };
 // clean
 template <typename value_type>
 class AVLTree;
 
 template <typename value_type>
-class treeNode : public Node<value_type> {
+class TreeNode : public Node<value_type> {
  public:
   void Balancing() {
     int l_height = 0, r_height = 0;
     int is_root = 0;
-    if (left != nullptr) {
-      l_height = left->height;
+    if (left_ != nullptr) {
+      l_height = left_->height_;
       is_root++;
     }
-    if (right != nullptr) {
-      r_height = right->height;
+    if (right_ != nullptr) {
+      r_height = right_->height_;
       is_root++;
     }
     if (is_root == 0) {
-      height = 0;
+      height_ = 0;
     } else {
-      height = std::max(l_height, r_height) + 1;
+      height_ = std::max(l_height, r_height) + 1;
     }
   }
 
  public:
-  int height = 0;
-  treeNode* left = nullptr;
-  treeNode* right = nullptr;
-  treeNode* parent = nullptr;
+  int height_ = 0;
+  TreeNode* left_ = nullptr;
+  TreeNode* right_ = nullptr;
+  TreeNode* parent_ = nullptr;
   friend class AVLTree<value_type>;
 };
 // clean
 template <typename value_type>
 class AVLTree {
  public:
-  treeNode<value_type>* root() {
+  TreeNode<value_type>* root() {
     return root_;
   }
-  AVLTree() : root_(new treeNode<value_type>){};
+  AVLTree() : root_(new TreeNode<value_type>){};
   ~AVLTree(){
 
   };
@@ -60,40 +60,41 @@ class AVLTree {
   int Size() {
     return node_counter_;
   };
-  treeNode<value_type>* InsertNode(treeNode<value_type>* iterator,
+  TreeNode<value_type>* InsertNode(TreeNode<value_type>* iterator,
                                    value_type key_of_new_node) {
     if (IsEmpty()) {
-      root_ = new treeNode<value_type>;
+      root_ = new TreeNode<value_type>;
       root_->key = key_of_new_node;
       this->node_counter_++;
       return root_;
     }
     if (iterator == nullptr) {
-      treeNode<value_type>* new_node = new treeNode<value_type>;
+      TreeNode<value_type>* new_node = new TreeNode<value_type>;
       this->node_counter_++;
       iterator = new_node; // 추가된 부분
       new_node->key = key_of_new_node;
       return new_node;
     } else if (iterator->key < key_of_new_node) {
-      iterator->right = InsertNode(iterator->right, key_of_new_node);
+      iterator->right_ = InsertNode(iterator->right_, key_of_new_node);
       // iterator->right->parent = iterator;
     } else {
-      iterator->left = InsertNode(iterator->left, key_of_new_node);
+      iterator->left_ = InsertNode(iterator->left_, key_of_new_node);
       // iterator->left->parent = iterator;
     }
-    iterator->height =
-        (std::max(NodeHeight(iterator->left), NodeHeight(iterator->right))) + 1;
+    iterator->height_ =
+        (std::max(NodeHeight(iterator->left_), NodeHeight(iterator->right_))) +
+        1;
     AdjustBlance(iterator, key_of_new_node);
     return iterator;
   };
   // iterator=new_node로 설정하는 부분 한 줄 추가했습니다.
-  treeNode<value_type>* EraseNode(treeNode<value_type>* root_node,
+  TreeNode<value_type>* EraseNode(TreeNode<value_type>* root_node,
                                   value_type key_of_target);
-  treeNode<value_type>* FindNodePtr(value_type find_target) {
-    treeNode<value_type>* iterator = root_;
+  TreeNode<value_type>* FindNodePtr(value_type find_target) {
+    TreeNode<value_type>* iterator = root_;
     while (iterator != nullptr && iterator->key != find_target) {
       iterator =
-          (find_target < iterator->key) ? iterator->left : iterator->right;
+          (find_target < iterator->key) ? iterator->left_ : iterator->right_;
     }
     if (iterator == nullptr) {
       return nullptr;
@@ -101,96 +102,98 @@ class AVLTree {
       return iterator;
     }
   };
-  treeNode<value_type>* Minimum(value_type x) {
-    treeNode<value_type>* iterator = FindNodePtr(x);
-    while (iterator->left != nullptr) {
-      iterator = iterator->left;
+  TreeNode<value_type>* Minimum(value_type x) {
+    TreeNode<value_type>* iterator = FindNodePtr(x);
+    while (iterator->left_ != nullptr) {
+      iterator = iterator->left_;
     }
     return iterator;
   };
-  treeNode<value_type>* Maximum(value_type x) {
-    treeNode<value_type>* iterator = FindNodePtr(x);
-    while (iterator->right != nullptr) {
-      iterator = iterator->right;
+  TreeNode<value_type>* Maximum(value_type x) {
+    TreeNode<value_type>* iterator = FindNodePtr(x);
+    while (iterator->right_ != nullptr) {
+      iterator = iterator->right_;
     }
     return iterator;
   };
   void Rank(value_type x);
   void Erase(value_type x);
-  int NodeHeight(treeNode<value_type>* target_node) {
+  int NodeHeight(TreeNode<value_type>* target_node) {
     if (target_node == nullptr) {
       return -1;
     }
-    return target_node->height;
+    return target_node->height_;
   };
   int FindDepth(value_type find_target) {
-    treeNode<value_type>* iterator = root_;
+    TreeNode<value_type>* iterator = root_;
     int depth_counter = 0;
     while (iterator != nullptr && iterator->key != find_target) {
       depth_counter++;
       iterator =
-          (find_target < iterator->key) ? iterator->left : iterator->right;
+          (find_target < iterator->key) ? iterator->left_ : iterator->right_;
     }
     return depth_counter;
   };
 
  protected:
   // clean;
-  int CalculateBalance(treeNode<value_type>* target_node) {
-    return NodeHeight(target_node->left) - NodeHeight(target_node->right);
+  int CalculateBalance(TreeNode<value_type>* target_node) {
+    return NodeHeight(target_node->left_) - NodeHeight(target_node->right_);
   };
-  treeNode<value_type>* LLRotation(treeNode<value_type>*& old_axis) {
-    treeNode<value_type>* new_axis = old_axis->right;
-    old_axis->right = new_axis->left;
-    new_axis->left = old_axis;
+  TreeNode<value_type>* LLRotation(TreeNode<value_type>*& old_axis) {
+    TreeNode<value_type>* new_axis = old_axis->right_;
+    old_axis->right_ = new_axis->left_;
+    new_axis->left_ = old_axis;
 
     if (old_axis == root_) {
       root_ = new_axis;
     }
-    old_axis->height =
-        std::max(NodeHeight(old_axis->left), NodeHeight(old_axis->right)) + 1;
-    new_axis->height =
-        std::max(NodeHeight(new_axis->left), NodeHeight(new_axis->right)) + 1;
+    old_axis->height_ =
+        std::max(NodeHeight(old_axis->left_), NodeHeight(old_axis->right_)) + 1;
+    new_axis->height_ =
+        std::max(NodeHeight(new_axis->left_), NodeHeight(new_axis->right_)) + 1;
     return new_axis;
   }
 
-  treeNode<value_type>* RRRotation(treeNode<value_type>*& old_axis) {
-    treeNode<value_type>* new_axis = old_axis->left;
-    old_axis->left = new_axis->right;
-    new_axis->right = old_axis;
+  TreeNode<value_type>* RRRotation(TreeNode<value_type>*& old_axis) {
+    TreeNode<value_type>* new_axis = old_axis->left_;
+    old_axis->left_ = new_axis->right_;
+    new_axis->right_ = old_axis;
     if (old_axis == root_) {
       root_ = new_axis;
     }
 
-    old_axis->height =
-        std::max(NodeHeight(old_axis->left), NodeHeight(old_axis->right)) + 1;
-    new_axis->height =
-        std::max(NodeHeight(new_axis->left), NodeHeight(new_axis->right)) + 1;
+    old_axis->height_ =
+        std::max(NodeHeight(old_axis->left_), NodeHeight(old_axis->right_)) + 1;
+    new_axis->height_ =
+        std::max(NodeHeight(new_axis->left_), NodeHeight(new_axis->right_)) + 1;
     return new_axis;
   }
   // 주석은 기존 코드입니다.
 
-  void AdjustBlance(treeNode<value_type>*& axis, value_type& target_key) {
+  void AdjustBlance(TreeNode<value_type>*& axis, value_type& target_key) {
     int balance_factor = CalculateBalance(axis);
     if (balance_factor == -1 || balance_factor == 0 || balance_factor == 1) {
       return;
     }
-    if (balance_factor > 1 && target_key < axis->left->key) { // ll상황
+    if (balance_factor > 1 && target_key < axis->left_->key) { // ll상황
       axis = RRRotation(axis);
-    } else if (balance_factor > 1 && target_key > axis->left->key) { // lr상황
-      axis->left = LLRotation(axis->left);
+    } else if (balance_factor > 1 && target_key > axis->left_->key) { // lr상황
+      axis->left_ = LLRotation(axis->left_);
       axis = RRRotation(axis);
-    } else if (balance_factor < -1 && target_key > axis->right->key) { // rr상황
+    } else if (balance_factor < -1 &&
+               target_key > axis->right_->key) { // rr상황
       axis = LLRotation(axis);
-    } else if (balance_factor < -1 && target_key < axis->right->key) { // rl상황
-      axis->right = RRRotation(axis->right);
+    } else if (balance_factor < -1 &&
+               target_key < axis->right_->key) { // rl상황
+      axis->right_ = RRRotation(axis->right_);
       axis = LLRotation(axis);
     }
   };
 
  protected:
   int node_counter_ = 0;
-  treeNode<value_type>* root_;
+  TreeNode<value_type>* root_;
 };
 template <typename value_type>
 class Set {
@@ -216,7 +219,7 @@ class AVLSet : public Set<value_type> {
     if (tree.IsEmpty()) {
       return;
     } else {
-      treeNode<value_type>* tmp = tree.Minimum(x);
+      TreeNode<value_type>* tmp = tree.Minimum(x);
       std::cout << tmp->get_key() << " " << tree.FindDepth(tmp->get_key())
                 << "\n";
     }
@@ -225,7 +228,7 @@ class AVLSet : public Set<value_type> {
     if (tree.IsEmpty()) {
       return;
     } else {
-      treeNode<value_type>* tmp = tree.Maximum(x);
+      TreeNode<value_type>* tmp = tree.Maximum(x);
       std::cout << tmp->get_key() << " " << tree.FindDepth(tmp->get_key())
                 << "\n";
     }

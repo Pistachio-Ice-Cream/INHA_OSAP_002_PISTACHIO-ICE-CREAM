@@ -27,16 +27,6 @@ class TreeNode : public Node<value_type> {
   void set_height(int new_height) {
     height_ = new_height;
   }
-  void Balancing() {
-    int height_of_left = -1, height_of_right = -1;
-    if (left_ != nullptr) {
-      height_of_left = left_->height();
-    }
-    if (right_ != nullptr) {
-      height_of_right = right_->height();
-    }
-    set_height(std::max(height_of_left, height_of_right) + 1);
-  }
 
  public:
   TreeNode* left_ = nullptr;

@@ -4,7 +4,7 @@
 template <typename value_type>
 class Node {
  public:
-  value_type key() {
+  value_type get_key() {
     return this->key_;
   }
 
@@ -18,29 +18,9 @@ class AVLTree;
 template <typename value_type>
 class TreeNode : public Node<value_type> {
  public:
-  void Balancing() {
-    int l_height = 0, r_height = 0;
-    int is_root = 0;
-    if (left_ != nullptr) {
-      l_height = left_->height_;
-      is_root++;
-    }
-    if (right_ != nullptr) {
-      r_height = right_->height_;
-      is_root++;
-    }
-    if (is_root == 0) {
-      height_ = 0;
-    } else {
-      height_ = std::max(l_height, r_height) + 1;
-    }
-  }
-
- public:
   int height_ = 0;
   TreeNode* left_ = nullptr;
   TreeNode* right_ = nullptr;
-  TreeNode* parent_ = nullptr;
   friend class AVLTree<value_type>;
 };
 // clean
@@ -51,9 +31,7 @@ class AVLTree {
     return root_;
   }
   AVLTree() : root_(new TreeNode<value_type>){};
-  ~AVLTree(){
-
-  };
+  ~AVLTree(){};
   bool IsEmpty() {
     return node_counter_ == 0;
   };
@@ -64,7 +42,7 @@ class AVLTree {
                                    value_type key_of_new_node) {
     if (IsEmpty()) {
       root_ = new TreeNode<value_type>;
-      root_->key = key_of_new_node;
+      root_->key_ = key_of_new_node;
       this->node_counter_++;
       return root_;
     }
@@ -72,9 +50,9 @@ class AVLTree {
       TreeNode<value_type>* new_node = new TreeNode<value_type>;
       this->node_counter_++;
       iterator = new_node; // 추가된 부분
-      new_node->key = key_of_new_node;
+      new_node->key_ = key_of_new_node;
       return new_node;
-    } else if (iterator->key < key_of_new_node) {
+    } else if (iterator->key_ < key_of_new_node) {
       iterator->right_ = InsertNode(iterator->right_, key_of_new_node);
       // iterator->right->parent = iterator;
     } else {
@@ -88,13 +66,67 @@ class AVLTree {
     return iterator;
   };
   // iterator=new_node로 설정하는 부분 한 줄 추가했습니다.
-  TreeNode<value_type>* EraseNode(TreeNode<value_type>* root_node,
-                                  value_type key_of_target);
+  TreeNode<value_type>* EraseNode(TreeNode<value_type>* iterator,
+                                  value_type key_of_target) {
+    if (iterator->key_ < key_of_target) {
+      iterator->right_ = EraseNode(iterator->right_, key_of_target);
+      // iterator->right->parent = iterator;
+    } else if (iterator->key_ > key_of_target) {
+      iterator->left_ = EraseNode(iterator->left_, key_of_target);
+      // iterator->left->parent = iterator;
+    } else if (iterator->key_ == key_of_target) { // 삭제할 노드 도착
+      if (Size() == 1) { // tree의 마지막 원소 삭제
+        this->root_ = nullptr;
+        delete iterator;
+        this->node_counter_ = 0;
+        return nullptr;
+      }
+      if (iterator->left_ == nullptr &&
+          iterator->right_ == nullptr) { // 자식 노드가 없는 경우
+        delete iterator;
+        node_counter_--;
+        return nullptr;
+      } else if (iterator->left_ != nullptr && // 왼쪽 자식 노드만 있는 경우
+                 iterator->right_ == nullptr) {
+        if (this->root_ == iterator) {
+          root_ = iterator->left_;
+        }
+        TreeNode<value_type>* successor = iterator->left_;
+        delete iterator;
+        node_counter_--;
+        iterator = successor;
+      } else if (iterator->left_ == nullptr && // 오른쪽 자식 노드만 있는 경우
+                 iterator->right_ != nullptr) {
+        if (this->root_ == iterator) {
+          root_ = iterator->right_;
+        }
+        TreeNode<value_type>* successor = iterator->right_;
+        node_counter_--;
+        delete iterator;
+        iterator = successor;
+      } else if (iterator->left_ != nullptr &&
+                 iterator->right_ != nullptr) { // 자식 노드가 2개인 경우
+        TreeNode<value_type>* successor =
+            Minimum(iterator->right_->key_); // 후임자 탐색
+        iterator->key_ = successor->key_;
+        successor->key_ = key_of_target; // 삭제할 노드와 후임자의 키 값 교환
+        iterator->right_ =
+            EraseNode(iterator->right_,
+                      key_of_target); // 오른쪽 서브트리에서 successor를
+                                      // 재귀적으로 삭제, 리밸런싱
+      }
+    }
+    iterator->height_ =
+        (std::max(NodeHeight(iterator->left_), NodeHeight(iterator->right_))) +
+        1;
+    AdjustBlance(iterator, key_of_target);
+    return iterator;
+  }
   TreeNode<value_type>* FindNodePtr(value_type find_target) {
     TreeNode<value_type>* iterator = root_;
-    while (iterator != nullptr && iterator->key != find_target) {
+    while (iterator != nullptr && iterator->key_ != find_target) {
       iterator =
-          (find_target < iterator->key) ? iterator->left_ : iterator->right_;
+          (find_target < iterator->key_) ? iterator->left_ : iterator->right_;
     }
     if (iterator == nullptr) {
       return nullptr;
@@ -117,7 +149,6 @@ class AVLTree {
     return iterator;
   };
   void Rank(value_type x);
-  void Erase(value_type x);
   int NodeHeight(TreeNode<value_type>* target_node) {
     if (target_node == nullptr) {
       return -1;
@@ -127,10 +158,10 @@ class AVLTree {
   int FindDepth(value_type find_target) {
     TreeNode<value_type>* iterator = root_;
     int depth_counter = 0;
-    while (iterator != nullptr && iterator->key != find_target) {
+    while (iterator != nullptr && iterator->key_ != find_target) {
       depth_counter++;
       iterator =
-          (find_target < iterator->key) ? iterator->left_ : iterator->right_;
+          (find_target < iterator->key_) ? iterator->left_ : iterator->right_;
     }
     return depth_counter;
   };
@@ -154,7 +185,6 @@ class AVLTree {
         std::max(NodeHeight(new_axis->left_), NodeHeight(new_axis->right_)) + 1;
     return new_axis;
   }
-
   TreeNode<value_type>* RRRotation(TreeNode<value_type>*& old_axis) {
     TreeNode<value_type>* new_axis = old_axis->left_;
     old_axis->left_ = new_axis->right_;
@@ -162,7 +192,6 @@ class AVLTree {
     if (old_axis == root_) {
       root_ = new_axis;
     }
-
     old_axis->height_ =
         std::max(NodeHeight(old_axis->left_), NodeHeight(old_axis->right_)) + 1;
     new_axis->height_ =
@@ -170,22 +199,21 @@ class AVLTree {
     return new_axis;
   }
   // 주석은 기존 코드입니다.
-
   void AdjustBlance(TreeNode<value_type>*& axis, value_type& target_key) {
     int balance_factor = CalculateBalance(axis);
     if (balance_factor == -1 || balance_factor == 0 || balance_factor == 1) {
       return;
     }
-    if (balance_factor > 1 && target_key < axis->left_->key) { // ll상황
+    if (balance_factor > 1 && target_key < axis->left_->key_) { // ll상황
       axis = RRRotation(axis);
-    } else if (balance_factor > 1 && target_key > axis->left_->key) { // lr상황
+    } else if (balance_factor > 1 && target_key > axis->left_->key_) { // lr상황
       axis->left_ = LLRotation(axis->left_);
       axis = RRRotation(axis);
     } else if (balance_factor < -1 &&
-               target_key > axis->right_->key) { // rr상황
+               target_key > axis->right_->key_) { // rr상황
       axis = LLRotation(axis);
     } else if (balance_factor < -1 &&
-               target_key < axis->right_->key) { // rl상황
+               target_key < axis->right_->key_) { // rl상황
       axis->right_ = RRRotation(axis->right_);
       axis = LLRotation(axis);
     }
@@ -252,7 +280,14 @@ class AVLSet : public Set<value_type> {
     std::cout << tree.FindDepth(x) << "\n";
   };
   // void Rank(value_type x);
-  // void Erase(value_type x);
+  void Erase(value_type x) {
+    if (tree.FindNodePtr(x) == nullptr) {
+      std::cout << "0\n";
+    } else {
+      std::cout << tree.FindDepth(x) << "\n";
+      tree.EraseNode(tree.root(), x);
+    }
+  };
 
  private:
   AVLTree<value_type> tree;
@@ -286,6 +321,10 @@ int main() {
         int x;
         std::cin >> x;
         s.Find(x);
+      } else if (cmd == "erase") {
+        int x;
+        std::cin >> x;
+        s.Erase(x);
       } else {
         int x;
         std::cin >> x;
@@ -294,3 +333,44 @@ int main() {
     }
   }
 }
+
+/*
+2
+20
+empty
+insert 18
+insert 17
+insert 4
+erase 17
+find 18
+insert 6
+insert 19
+insert 15
+insert 1
+rank 3
+insert 2
+minimum 18
+rank 15
+erase 6
+insert 17
+insert 14
+insert 3
+maximum 14
+size
+14
+insert 14
+erase 14
+insert 17
+insert 1
+lnsert 8
+empty
+insert 18
+insert 13
+insert 16
+rank 16
+insert 19
+find 8
+erase 17
+maximum 13
+
+*/

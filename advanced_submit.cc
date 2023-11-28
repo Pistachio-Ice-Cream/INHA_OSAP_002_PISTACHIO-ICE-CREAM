@@ -116,23 +116,11 @@ class AVLTree {
     }
     return iterator;
   };
-  void Inorder(TreeNode<value_type>* node, const value_type find_tarket, int& rank) {
-    if(node == nullptr) {
-      return;
-    }
-    // 왼쪽 서브트리로 재귀
-    Inorder(node->left_, find_tarket, rank);
-    // 만약 key값이 find_target 보다 작다면 rank를 높임 
-    if(node->key_ <= find_tarket) {
-      rank++;
-    }
-    // 오른쪽 서브트리로 재귀
-    Inorder(node->right_, find_tarket, rank);
-  }
   int Rank(value_type find_target) {
     TreeNode<value_type>* iterator = root_;
     int rank = 0;
-    Inorder(iterator, find_target, &rank);
+    int& ref_rank = rank;
+    Inorder(iterator, find_target, ref_rank);
     return rank;
   }
   void Erase(value_type x);
@@ -208,6 +196,19 @@ class AVLTree {
       axis = LLRotation(axis);
     }
   };
+  void Inorder(TreeNode<value_type>* node, const value_type find_tarket, int& rank) {
+    if(node == nullptr) {
+      return;
+    }
+    // 왼쪽 서브트리로 재귀
+    Inorder(node->left_, find_tarket, rank);
+    // 만약 key값이 find_target 보다 작다면 rank를 높임 
+    if(node->key_ <= find_tarket) {
+      rank++;
+    }
+    // 오른쪽 서브트리로 재귀
+    Inorder(node->right_, find_tarket, rank);
+  }
 
  protected:
   int node_counter_ = 0;
@@ -271,8 +272,13 @@ class AVLSet : public Set<value_type> {
     std::cout << tree.FindDepth(x) << "\n";
   };
   void Rank(value_type x) {
-    std::cout << tree.Rank(x) << "\n";
-  }
+    if (tree.FindNodePtr(x) == nullptr) {
+      std::cout << "0" << "\n";
+    }
+    else {
+      std::cout << tree.FindDepth(x) << " " << tree.Rank(x) << "\n";
+    }
+ }
   // void Erase(value_type x);
 
  private:

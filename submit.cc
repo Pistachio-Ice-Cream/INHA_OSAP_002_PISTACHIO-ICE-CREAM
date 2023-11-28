@@ -28,21 +28,14 @@ class TreeNode : public Node<value_type> {
     height_ = new_height;
   }
   void Balancing() {
-    int height_of_left = 0, height_of_right = 0;
-    bool is_root = true;
+    int height_of_left = -1, height_of_right = -1;
     if (left_ != nullptr) {
       height_of_left = left_->height();
-      is_root = false;
     }
     if (right_ != nullptr) {
       height_of_right = right_->height();
-      is_root = false;
     }
-    if (is_root == true) {
-      set_height(0);
-    } else {
-      set_height(std::max(height_of_left, height_of_right) + 1);
-    }
+    set_height(std::max(height_of_left, height_of_right) + 1);
   }
 
  public:
@@ -110,11 +103,7 @@ class AVLTree {
       iterator =
           (find_target < iterator->key()) ? iterator->left_ : iterator->right_;
     }
-    if (iterator == nullptr) {
-      return nullptr;
-    } else {
-      return iterator;
-    }
+    return iterator;
   }
   TreeNode<value_type>* Minimum(value_type x) {
     TreeNode<value_type>* iterator = FindNodePtr(x);

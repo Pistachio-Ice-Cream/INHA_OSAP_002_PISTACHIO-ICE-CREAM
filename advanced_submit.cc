@@ -87,16 +87,10 @@ class AVLTree {
   // iterator=new_node로 설정하는 부분 한 줄 추가했습니다.
   TreeNode<value_type>* EraseNode(TreeNode<value_type>* iterator,
                                   value_type key_of_target) {
-    if (iterator->key() < key_of_target) {
-      iterator->right_ = EraseNode(iterator->right_, key_of_target);
-      // iterator->right->parent = iterator;
-    } else if (iterator->key() > key_of_target) {
-      iterator->left_ = EraseNode(iterator->left_, key_of_target);
-      // iterator->left->parent = iterator;
-    } else if (iterator->key() == key_of_target) { // 삭제할 노드 도착
-      if (Size() == 1) { // tree의 마지막 원소 삭제
-        this->root_ = nullptr;
+    if (iterator->key() == key_of_target) { // 삭제할 노드 도착
+      if (Size() == 1) {                    // tree의 마지막 원소 삭제
         delete iterator;
+        this->root_ = nullptr;
         this->node_counter_ = 0;
         return nullptr;
       }
@@ -111,9 +105,9 @@ class AVLTree {
           root_ = iterator->left_;
         }
         TreeNode<value_type>* successor = iterator->left_;
-        delete iterator;
         node_counter_--;
-        iterator = successor;
+        delete iterator;
+        return successor;
       } else if (iterator->left_ == nullptr && // 오른쪽 자식 노드만 있는 경우
                  iterator->right_ != nullptr) {
         if (this->root_ == iterator) {
@@ -122,7 +116,7 @@ class AVLTree {
         TreeNode<value_type>* successor = iterator->right_;
         node_counter_--;
         delete iterator;
-        iterator = successor;
+        return successor;
       } else if (iterator->left_ != nullptr &&
                  iterator->right_ != nullptr) { // 자식 노드가 2개인 경우
         TreeNode<value_type>* successor =
@@ -134,11 +128,19 @@ class AVLTree {
                       key_of_target); // 오른쪽 서브트리에서 successor를
                                       // 재귀적으로 삭제, 리밸런싱
       }
+    } else if (iterator->key() < key_of_target) {
+      iterator->right_ = EraseNode(iterator->right_, key_of_target);
+      // iterator->right->parent = iterator;
+    } else if (iterator->key() > key_of_target) {
+      iterator->left_ = EraseNode(iterator->left_, key_of_target);
+      // iterator->left->parent = iterator;
     }
     iterator->height_ =
         (std::max(NodeHeight(iterator->left_), NodeHeight(iterator->right_))) +
         1;
-    AdjustBlance(iterator, key_of_target);
+    if (iterator != nullptr) {
+      AdjustBlance(iterator, key_of_target);
+    }
     return iterator;
   }
   TreeNode<value_type>* FindNodePtr(value_type find_target) {
@@ -163,14 +165,14 @@ class AVLTree {
     }
     return iterator;
   }
+  int rank;
   int Rank(value_type find_target) {
     TreeNode<value_type>* iterator = root_;
-    int rank = 0;
-    int& ref_rank = rank;
-    Inorder(iterator, find_target, ref_rank);
+    rank = 0;
+    // int& ref_rank = rank;
+    Inorder(iterator, find_target);
     return rank;
   }
-  void Erase(value_type x);
   int NodeHeight(TreeNode<value_type>* target_node) const {
     if (target_node == nullptr) {
       return -1;
@@ -191,9 +193,15 @@ class AVLTree {
  protected:
   // clean;
   int CalculateBalance(TreeNode<value_type>* target_node) {
+    if (target_node == nullptr) {
+      return 0;
+    }
     return NodeHeight(target_node->left_) - NodeHeight(target_node->right_);
   };
   TreeNode<value_type>* LLRotation(TreeNode<value_type>*& old_axis) {
+    if (old_axis->right_ == nullptr) {
+      return old_axis;
+    }
     TreeNode<value_type>* new_axis = old_axis->right_;
     old_axis->right_ = new_axis->left_;
     new_axis->left_ = old_axis;
@@ -211,6 +219,9 @@ class AVLTree {
   }
 
   TreeNode<value_type>* RRRotation(TreeNode<value_type>*& old_axis) {
+    if (old_axis->left_ == nullptr) {
+      return old_axis;
+    }
     TreeNode<value_type>* new_axis = old_axis->left_;
     old_axis->left_ = new_axis->right_;
     new_axis->right_ = old_axis;
@@ -233,7 +244,8 @@ class AVLTree {
     if (balance_factor == -1 || balance_factor == 0 || balance_factor == 1) {
       return;
     }
-    if (balance_factor > 1 && target_key < axis->left_->key()) { // ll상황
+    if (balance_factor > 1 &&
+        target_key < axis->left_->key()) { // ll상황, 왼쪽이 더 높음
       axis = RRRotation(axis);
     } else if (balance_factor > 1 &&
                target_key > axis->left_->key()) { // lr상황
@@ -252,19 +264,18 @@ class AVLTree {
  protected:
   int node_counter_ = 0;
   TreeNode<value_type>* root_;
-  void Inorder(TreeNode<value_type>* node, const value_type find_tarket,
-               int& rank) {
+  void Inorder(TreeNode<value_type>* node, const value_type find_tarket) {
     if (node == nullptr) {
       return;
     }
-    // 왼쪽 서브트리로 재귀
-    Inorder(node->left_, find_tarket, rank);
     // 만약 key값이 find_target 보다 작다면 rank를 높임
     if (node->key() <= find_tarket) {
       rank++;
     }
+    // 왼쪽 서브트리로 재귀
+    Inorder(node->left_, find_tarket);
     // 오른쪽 서브트리로 재귀
-    Inorder(node->right_, find_tarket, rank);
+    Inorder(node->right_, find_tarket);
   }
   TreeNode<value_type>* CopyTree(const TreeNode<value_type>* node) {
     if (node == nullptr) {
@@ -346,7 +357,8 @@ class AVLSet : public Set<value_type> {
   }
   void Erase(value_type x) {
     if (tree.FindNodePtr(x) == nullptr) {
-      std::cout << "0\n";
+      std::cout << "0"
+                << "\n";
     } else {
       std::cout << tree.FindDepth(x) << "\n";
       tree.EraseNode(tree.root(), x);
@@ -393,7 +405,7 @@ int main() {
         int x;
         std::cin >> x;
         s.Erase(x);
-      } else {
+      } else if (cmd == "insert") {
         int x;
         std::cin >> x;
         s.Insert(x);

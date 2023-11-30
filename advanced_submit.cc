@@ -27,16 +27,11 @@ class TreeNode : public Node<value_type> {
   void set_height(int new_height) {
     height_ = new_height;
   }
-  // TODO: 필드 추가하여 O(lon g)로 변경 필요
-  int SubTreeSize() {
-    int l = 0; int r = 0;
-    if (left_ != nullptr) {
-      l = left_->SubTreeSize();
-    }
-    if (right_ != nullptr) {
-      r = right_->SubTreeSize();
-    }
-    return l + r + 1;
+  int get_subsize() {
+    return subsize;
+  }
+  void set_subsize(int new_subsize) {
+    this->subsize = new_subsize;
   }
 
  public:
@@ -46,6 +41,7 @@ class TreeNode : public Node<value_type> {
 
  private:
   int height_ = 0;
+  int subsize = 1;
 };
 // clean
 template <typename value_type>
@@ -62,6 +58,15 @@ class AVLTree {
   }
   ~AVLTree() {
   }
+
+  int Getsubsize(TreeNode<value_type>* node) {
+    if (node == nullptr) {
+      return 0;
+    } else {
+      return node->get_subsize();
+    }
+  }
+
   bool IsEmpty() {
     return node_counter_ == 0;
   }
@@ -85,10 +90,14 @@ class AVLTree {
     } else if (iterator->key() < key_of_new_node) {
       iterator->right_ = InsertNode(iterator->right_, key_of_new_node);
       // iterator->right->parent = iterator;
+      // iterator->subsize++;
     } else {
       iterator->left_ = InsertNode(iterator->left_, key_of_new_node);
       // iterator->left->parent = iterator;
+      // iterator->subsize++;
     }
+    iterator->set_subsize(Getsubsize(iterator->left_) +
+                          Getsubsize(iterator->right_) + 1);
     iterator->set_height(
         (std::max(NodeHeight(iterator->left_), NodeHeight(iterator->right_))) +
         1);
@@ -133,11 +142,10 @@ class AVLTree {
         TreeNode<value_type>* successor =
             Minimum(iterator->right_->key()); // 후임자 탐색
         iterator->set_key(successor->key());
-        successor->set_key(key_of_target); // 삭제할 노드와 후임자의 키 값 교환
         iterator->right_ =
             EraseNode(iterator->right_,
-                      key_of_target); // 오른쪽 서브트리에서 successor를
-                                      // 재귀적으로 삭제, 리밸런싱
+                      successor->key()); // 오른쪽 서브트리에서 successor를
+                                         // 재귀적으로 삭제, 리밸런싱
       }
     } else if (iterator->key() < key_of_target) {
       iterator->right_ = EraseNode(iterator->right_, key_of_target);
@@ -146,6 +154,8 @@ class AVLTree {
       iterator->left_ = EraseNode(iterator->left_, key_of_target);
       // iterator->left->parent = iterator;
     }
+    iterator->set_subsize(Getsubsize(iterator->left_) +
+                          Getsubsize(iterator->right_) + 1);
     iterator->height_ =
         (std::max(NodeHeight(iterator->left_), NodeHeight(iterator->right_))) +
         1;
@@ -176,21 +186,28 @@ class AVLTree {
     }
     return iterator;
   }
-  int Rank(TreeNode<value_type>* target_node, value_type x) {
-    if (target_node == nullptr) {
-      return 0;
-    }
-    if (target_node->key() <= x) {
-      if (target_node->left_ == nullptr) {
-        return 1 + Rank(target_node->right_, x);
+  int rank;
+  /*
+  int Rank(value_type find_target) {
+          TreeNode<value_type>* iterator = root_;
+          rank = 0;
+          // int& ref_rank = rank;
+          Inorder(iterator, find_target);
+          return rank;
+  }
+  */
+  int Rank(TreeNode<value_type>* iterator, value_type find_target) {
+    rank = 0;
+    while (iterator->key() != find_target) {
+      if (iterator->key() < find_target) {
+        rank += Getsubsize(iterator->left_) + 1;
+        iterator = iterator->right_;
+      } else if (iterator->key() > find_target) {
+        iterator = iterator->left_;
       }
-      else {
-        return 1 + target_node->left_->SubTreeSize() + Rank(target_node->right_, x);
-      }
     }
-    else {
-        return Rank(target_node->left_, x);
-    }  
+    rank += Getsubsize(iterator->left_) + 1;
+    return rank;
   }
   int NodeHeight(TreeNode<value_type>* target_node) const {
     if (target_node == nullptr) {
@@ -234,6 +251,10 @@ class AVLTree {
     new_axis->set_height(
         std::max(NodeHeight(new_axis->left_), NodeHeight(new_axis->right_)) +
         1);
+    old_axis->set_subsize(Getsubsize(old_axis->left_) +
+                          Getsubsize(old_axis->right_) + 1);
+    new_axis->set_subsize(Getsubsize(new_axis->left_) +
+                          Getsubsize(new_axis->right_) + 1);
     return new_axis;
   }
 
@@ -254,6 +275,10 @@ class AVLTree {
     new_axis->set_height(
         std::max(NodeHeight(new_axis->left_), NodeHeight(new_axis->right_)) +
         1);
+    old_axis->set_subsize(Getsubsize(old_axis->left_) +
+                          Getsubsize(old_axis->right_) + 1);
+    new_axis->set_subsize(Getsubsize(new_axis->left_) +
+                          Getsubsize(new_axis->right_) + 1);
     return new_axis;
   }
   // 주석은 기존 코드입니다.
@@ -283,7 +308,23 @@ class AVLTree {
  protected:
   int node_counter_ = 0;
   TreeNode<value_type>* root_;
-
+  /*
+  void Inorder(TreeNode<value_type>* node, const value_type find_tarket) {
+    if (node == nullptr) {
+      return;
+    }
+    // 만약 key값이 find_target 보다 작다면 rank를 높임
+    if (node->key() <= find_tarket) {
+      rank++;
+    } else {
+      return;
+    }
+    // 왼쪽 서브트리로 재귀
+    Inorder(node->left_, find_tarket);
+    // 오른쪽 서브트리로 재귀
+    Inorder(node->right_, find_tarket);
+  }
+  */
   TreeNode<value_type>* CopyTree(const TreeNode<value_type>* node) {
     if (node == nullptr) {
       return nullptr;
@@ -356,10 +397,11 @@ class AVLSet : public Set<value_type> {
   }
   void Rank(value_type x) {
     if (tree.FindNodePtr(x) == nullptr) {
-      std::cout << "0" << "\n";
-    }
-    else {
-      std::cout << tree.FindDepth(x) << " " << tree.Rank(tree.root(), x) << "\n";
+      std::cout << "0"
+                << "\n";
+    } else {
+      std::cout << tree.FindDepth(x) << " " << tree.Rank(tree.root(), x)
+                << "\n";
     }
   }
   void Erase(value_type x) {

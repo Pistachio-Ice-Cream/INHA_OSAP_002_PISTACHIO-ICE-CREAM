@@ -27,6 +27,17 @@ class TreeNode : public Node<value_type> {
   void set_height(int new_height) {
     height_ = new_height;
   }
+  // TODO: 필드 추가하여 O(lon g)로 변경 필요
+  int SubTreeSize() {
+    int l = 0; int r = 0;
+    if (left_ != nullptr) {
+      l = left_->SubTreeSize();
+    }
+    if (right_ != nullptr) {
+      r = right_->SubTreeSize();
+    }
+    return l + r + 1;
+  }
 
  public:
   TreeNode* left_ = nullptr;
@@ -165,13 +176,21 @@ class AVLTree {
     }
     return iterator;
   }
-  int rank;
-  int Rank(value_type find_target) {
-    TreeNode<value_type>* iterator = root_;
-    rank = 0;
-    // int& ref_rank = rank;
-    Inorder(iterator, find_target);
-    return rank;
+  int Rank(TreeNode<value_type>* target_node, value_type x) {
+    if (target_node == nullptr) {
+      return 0;
+    }
+    if (target_node->key() <= x) {
+      if (target_node->left_ == nullptr) {
+        return 1 + Rank(target_node->right_, x);
+      }
+      else {
+        return 1 + target_node->left_->SubTreeSize() + Rank(target_node->right_, x);
+      }
+    }
+    else {
+        return Rank(target_node->left_, x);
+    }  
   }
   int NodeHeight(TreeNode<value_type>* target_node) const {
     if (target_node == nullptr) {
@@ -264,19 +283,7 @@ class AVLTree {
  protected:
   int node_counter_ = 0;
   TreeNode<value_type>* root_;
-  void Inorder(TreeNode<value_type>* node, const value_type find_tarket) {
-    if (node == nullptr) {
-      return;
-    }
-    // 만약 key값이 find_target 보다 작다면 rank를 높임
-    if (node->key() <= find_tarket) {
-      rank++;
-    }
-    // 왼쪽 서브트리로 재귀
-    Inorder(node->left_, find_tarket);
-    // 오른쪽 서브트리로 재귀
-    Inorder(node->right_, find_tarket);
-  }
+
   TreeNode<value_type>* CopyTree(const TreeNode<value_type>* node) {
     if (node == nullptr) {
       return nullptr;
@@ -349,10 +356,10 @@ class AVLSet : public Set<value_type> {
   }
   void Rank(value_type x) {
     if (tree.FindNodePtr(x) == nullptr) {
-      std::cout << "0"
-                << "\n";
-    } else {
-      std::cout << tree.FindDepth(x) << " " << tree.Rank(x) << "\n";
+      std::cout << "0" << "\n";
+    }
+    else {
+      std::cout << tree.FindDepth(x) << " " << tree.Rank(tree.root(), x) << "\n";
     }
   }
   void Erase(value_type x) {

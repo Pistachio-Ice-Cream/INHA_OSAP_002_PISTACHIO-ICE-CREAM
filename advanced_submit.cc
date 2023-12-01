@@ -86,7 +86,7 @@ class AVLTree {
     iterator->set_height(
         (std::max(NodeHeight(iterator->left_), NodeHeight(iterator->right_))) +
         1);
-    AdjustBlance(iterator, key_of_new_node);
+    AdjustBalance(iterator, key_of_new_node);
     // AVL 트리의 균형 연산 완료 후에 현재 노드의 size_ 값을 업데이트
     iterator->set_size(1 + (iterator->left_ != nullptr ? iterator->left_->size() : 0)
       + (iterator->right_ != nullptr ? iterator->right_->size() : 0));
@@ -148,7 +148,7 @@ class AVLTree {
         (std::max(NodeHeight(iterator->left_), NodeHeight(iterator->right_))) +
         1;
     if (iterator != nullptr) {
-      AdjustBlance(iterator, key_of_target);
+      AdjustBalance(iterator, key_of_target);
     }
     // AVL 트리의 균형 연산 완료 후에 현재 노드의 size_ 값을 업데이트
     iterator->set_size(1 + (iterator->left_ != nullptr ? iterator->left_->size() : 0)
@@ -257,25 +257,28 @@ class AVLTree {
   }
   // 주석은 기존 코드입니다.
 
-  void AdjustBlance(TreeNode<value_type>*& axis, value_type& target_key) {
+  void AdjustBalance(TreeNode<value_type>*& axis, value_type& target_key) {
     int balance_factor = CalculateBalance(axis);
     if (balance_factor == -1 || balance_factor == 0 || balance_factor == 1) {
       return;
     }
-    if (balance_factor > 1 &&
-        target_key < axis->left_->key()) { // ll상황, 왼쪽이 더 높음
-      axis = RRRotation(axis);
-    } else if (balance_factor > 1 &&
-               target_key > axis->left_->key()) { // lr상황
-      axis->left_ = LLRotation(axis->left_);
-      axis = RRRotation(axis);
-    } else if (balance_factor < -1 &&
-               target_key > axis->right_->key()) { // rr상황
-      axis = LLRotation(axis);
-    } else if (balance_factor < -1 &&
-               target_key < axis->right_->key()) { // rl상황
-      axis->right_ = RRRotation(axis->right_);
-      axis = LLRotation(axis);
+
+    if (balance_factor > 1) {
+      balance_factor = CalculateBalance(axis->left_);
+      if (balance_factor >= 0) {
+        axis = RRRotation(axis);
+      } else {
+        axis->left_ = LLRotation(axis->left_);
+        axis = RRRotation(axis);
+      }
+    } else if (balance_factor < -1) {
+      balance_factor = CalculateBalance(axis->right_);
+      if (balance_factor <= 0) {
+        axis = LLRotation(axis);
+      } else {
+        axis->right_ = RRRotation(axis->right_);
+        axis = LLRotation(axis);
+      }
     }
   }
 

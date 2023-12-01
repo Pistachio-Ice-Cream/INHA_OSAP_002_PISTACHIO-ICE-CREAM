@@ -107,7 +107,7 @@ TreeNode<value_type> *AVLTree<value_type>::InsertNode(
       1);
   /*재귀적으로 자식 노드들로부터 Height를 계산해줍니다.
   새로 추가한 노드부터 리턴되며 재귀적으로 Height를 계산하게 될 것입니다.*/
-  AdjustBlance(iterator, key_of_new_node);
+  AdjustBalance(iterator, key_of_new_node);
   // 삽입 과정을 마친 후 밸런스 조정 함수로 넘어갑니다.
   return iterator;
 }
@@ -214,7 +214,7 @@ TreeNode<value_type> *AVLTree<value_type>::RRRotation(
 }
 
 template <typename value_type>
-void AVLTree<value_type>::AdjustBlance(TreeNode<value_type> *&axis,
+void AVLTree<value_type>::AdjustBalance(TreeNode<value_type> *&axis,
                                        value_type &target_key) {
   // 축과 키를 기준으로 밸런스를 조정합니다.
   int balance_factor = CalculateBalance(axis);

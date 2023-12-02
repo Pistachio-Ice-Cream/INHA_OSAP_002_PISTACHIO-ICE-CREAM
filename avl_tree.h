@@ -60,7 +60,7 @@ class AVLTree {
   int CalculateBalance(TreeNode<value_type>* target_node);
   TreeNode<value_type>* LLRotation(TreeNode<value_type>*& old_axis);
   TreeNode<value_type>* RRRotation(TreeNode<value_type>*& old_axis);
-  void AdjustBlance(TreeNode<value_type>*& axis, value_type& target_key);
+  void AdjustBalance(TreeNode<value_type>*& axis, value_type& target_key);
   TreeNode<value_type>* EraseNode(TreeNode<value_type>* root_node,
                                   value_type key_of_target);
 

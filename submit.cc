@@ -81,7 +81,7 @@ class AVLTree {
     iterator->set_height(
         (std::max(NodeHeight(iterator->left_), NodeHeight(iterator->right_))) +
         1);
-    AdjustBlance(iterator, key_of_new_node);
+    AdjustBalance(iterator, key_of_new_node);
     return iterator;
   }
   // iterator=new_node로 설정하는 부분 한 줄 추가했습니다.
@@ -168,7 +168,7 @@ class AVLTree {
   }
   // 주석은 기존 코드입니다.
 
-  void AdjustBlance(TreeNode<value_type>*& axis, value_type& target_key) {
+  void AdjustBalance(TreeNode<value_type>*& axis, value_type& target_key) {
     int balance_factor = CalculateBalance(axis);
     if (balance_factor == -1 || balance_factor == 0 || balance_factor == 1) {
       return;

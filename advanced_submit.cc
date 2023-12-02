@@ -27,16 +27,11 @@ class TreeNode : public Node<value_type> {
   void set_height(int new_height) {
     height_ = new_height;
   }
-  // TODO: 필드 추가하여 O(lon g)로 변경 필요
-  int SubTreeSize() {
-    int l = 0; int r = 0;
-    if (left_ != nullptr) {
-      l = left_->SubTreeSize();
-    }
-    if (right_ != nullptr) {
-      r = right_->SubTreeSize();
-    }
-    return l + r + 1;
+  int size() const {
+    return size_;
+  }
+  void set_size(int new_size) {
+    size_ = new_size;
   }
 
  public:
@@ -46,6 +41,7 @@ class TreeNode : public Node<value_type> {
 
  private:
   int height_ = 0;
+  int size_ = 1;
 };
 // clean
 template <typename value_type>
@@ -79,20 +75,22 @@ class AVLTree {
     if (iterator == nullptr) {
       TreeNode<value_type>* new_node = new TreeNode<value_type>;
       this->node_counter_++;
-      iterator = new_node; // 추가된 부분
+      iterator = new_node;
       new_node->set_key(key_of_new_node);
       return new_node;
     } else if (iterator->key() < key_of_new_node) {
       iterator->right_ = InsertNode(iterator->right_, key_of_new_node);
-      // iterator->right->parent = iterator;
     } else {
       iterator->left_ = InsertNode(iterator->left_, key_of_new_node);
-      // iterator->left->parent = iterator;
     }
     iterator->set_height(
         (std::max(NodeHeight(iterator->left_), NodeHeight(iterator->right_))) +
         1);
-    AdjustBlance(iterator, key_of_new_node);
+    AdjustBalance(iterator, key_of_new_node);
+    // AVL 트리의 균형 연산 완료 후에 현재 노드의 size_ 값을 업데이트
+    iterator->set_size(1 + (iterator->left_ != nullptr ? iterator->left_->size() : 0)
+      + (iterator->right_ != nullptr ? iterator->right_->size() : 0));
+    
     return iterator;
   }
   // iterator=new_node로 설정하는 부분 한 줄 추가했습니다.
@@ -150,8 +148,11 @@ class AVLTree {
         (std::max(NodeHeight(iterator->left_), NodeHeight(iterator->right_))) +
         1;
     if (iterator != nullptr) {
-      AdjustBlance(iterator, key_of_target);
+      AdjustBalance(iterator, key_of_target);
     }
+    // AVL 트리의 균형 연산 완료 후에 현재 노드의 size_ 값을 업데이트
+    iterator->set_size(1 + (iterator->left_ != nullptr ? iterator->left_->size() : 0)
+      + (iterator->right_ != nullptr ? iterator->right_->size() : 0));
     return iterator;
   }
   TreeNode<value_type>* FindNodePtr(value_type find_target) {
@@ -183,13 +184,11 @@ class AVLTree {
     if (target_node->key() <= x) {
       if (target_node->left_ == nullptr) {
         return 1 + Rank(target_node->right_, x);
+      } else {
+        return 1 + target_node->left_->size() + Rank(target_node->right_, x);
       }
-      else {
-        return 1 + target_node->left_->SubTreeSize() + Rank(target_node->right_, x);
-      }
-    }
-    else {
-        return Rank(target_node->left_, x);
+    } else {
+      return Rank(target_node->left_, x);
     }  
   }
   int NodeHeight(TreeNode<value_type>* target_node) const {
@@ -258,25 +257,28 @@ class AVLTree {
   }
   // 주석은 기존 코드입니다.
 
-  void AdjustBlance(TreeNode<value_type>*& axis, value_type& target_key) {
+  void AdjustBalance(TreeNode<value_type>*& axis, value_type& target_key) {
     int balance_factor = CalculateBalance(axis);
     if (balance_factor == -1 || balance_factor == 0 || balance_factor == 1) {
       return;
     }
-    if (balance_factor > 1 &&
-        target_key < axis->left_->key()) { // ll상황, 왼쪽이 더 높음
-      axis = RRRotation(axis);
-    } else if (balance_factor > 1 &&
-               target_key > axis->left_->key()) { // lr상황
-      axis->left_ = LLRotation(axis->left_);
-      axis = RRRotation(axis);
-    } else if (balance_factor < -1 &&
-               target_key > axis->right_->key()) { // rr상황
-      axis = LLRotation(axis);
-    } else if (balance_factor < -1 &&
-               target_key < axis->right_->key()) { // rl상황
-      axis->right_ = RRRotation(axis->right_);
-      axis = LLRotation(axis);
+
+    if (balance_factor > 1) {
+      balance_factor = CalculateBalance(axis->left_);
+      if (balance_factor >= 0) {
+        axis = RRRotation(axis);
+      } else {
+        axis->left_ = LLRotation(axis->left_);
+        axis = RRRotation(axis);
+      }
+    } else if (balance_factor < -1) {
+      balance_factor = CalculateBalance(axis->right_);
+      if (balance_factor <= 0) {
+        axis = LLRotation(axis);
+      } else {
+        axis->right_ = RRRotation(axis->right_);
+        axis = LLRotation(axis);
+      }
     }
   }
 
@@ -309,6 +311,8 @@ class Set {
   void Size(){};
   void Find(value_type x){};
   void Insert(value_type x){};
+  void Rank(value_type x){};
+  void Erase(value_type x){};
 };
 
 template <typename value_type>

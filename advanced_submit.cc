@@ -233,6 +233,12 @@ class AVLTree {
     new_axis->set_height(
         std::max(NodeHeight(new_axis->left_), NodeHeight(new_axis->right_)) +
         1);
+
+    old_axis->set_size(1 + (old_axis->left_ != nullptr ? old_axis->left_->size() : 0)
+      + (old_axis->right_ != nullptr ? old_axis->right_->size() : 0));
+    new_axis->set_size(1 + (new_axis->left_ != nullptr ? new_axis->left_->size() : 0)
+      + (new_axis->right_ != nullptr ? new_axis->right_->size() : 0));
+
     return new_axis;
   }
 
@@ -253,6 +259,12 @@ class AVLTree {
     new_axis->set_height(
         std::max(NodeHeight(new_axis->left_), NodeHeight(new_axis->right_)) +
         1);
+
+    old_axis->set_size(1 + (old_axis->left_ != nullptr ? old_axis->left_->size() : 0)
+      + (old_axis->right_ != nullptr ? old_axis->right_->size() : 0));
+    new_axis->set_size(1 + (new_axis->left_ != nullptr ? new_axis->left_->size() : 0)
+      + (new_axis->right_ != nullptr ? new_axis->right_->size() : 0));
+    
     return new_axis;
   }
   // 주석은 기존 코드입니다.

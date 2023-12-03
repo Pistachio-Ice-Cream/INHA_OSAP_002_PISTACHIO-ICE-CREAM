@@ -34,13 +34,13 @@ class TreeNode : public Node<value_type> {
     size_ = new_size;
   }
 
-  boolean LeftIsNull() {
+  bool LeftIsNull() {
     return left_ == nullptr;
   }
-  boolean RightIsNull() {
+  bool RightIsNull() {
     return right_ == nullptr;
   }
-  boolean NoChild() {
+  bool NoChild() {
     return ((left_ == nullptr) && (right_ == nullptr));
   }
 

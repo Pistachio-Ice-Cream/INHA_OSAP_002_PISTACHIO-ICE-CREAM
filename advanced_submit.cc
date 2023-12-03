@@ -34,6 +34,16 @@ class TreeNode : public Node<value_type> {
     size_ = new_size;
   }
 
+  boolean LeftIsNull() {
+    return left_ == nullptr;
+  }
+  boolean RightIsNull() {
+    return right_ == nullptr;
+  }
+  boolean NoChild() {
+    return ((left_ == nullptr) && (right_ == nullptr));
+  }
+
  public:
   TreeNode* left_ = nullptr;
   TreeNode* right_ = nullptr;
@@ -83,13 +93,10 @@ class AVLTree {
     } else {
       iterator->left_ = InsertNode(iterator->left_, key_of_new_node);
     }
-    iterator->set_height(
-        (std::max(NodeHeight(iterator->left_), NodeHeight(iterator->right_))) +
-        1);
+    iterator->set_height(CalculateHeight(iterator));
     AdjustBalance(iterator, key_of_new_node);
     // AVL 트리의 균형 연산 완료 후에 현재 노드의 size_ 값을 업데이트
-    iterator->set_size(1 + (iterator->left_ != nullptr ? iterator->left_->size() : 0)
-      + (iterator->right_ != nullptr ? iterator->right_->size() : 0));
+    iterator->set_size(CalculateSize(iterator));
     
     return iterator;
   }
@@ -103,13 +110,12 @@ class AVLTree {
         this->node_counter_ = 0;
         return nullptr;
       }
-      if (iterator->left_ == nullptr &&
-          iterator->right_ == nullptr) { // 자식 노드가 없는 경우
+      if (iterator->NoChild()) { // 자식 노드가 없는 경우
         delete iterator;
         node_counter_--;
         return nullptr;
-      } else if (iterator->left_ != nullptr && // 왼쪽 자식 노드만 있는 경우
-                 iterator->right_ == nullptr) {
+      } else if (!iterator->LeftIsNull() && // 왼쪽 자식 노드만 있는 경우
+                 iterator->RightIsNull()) {
         if (this->root_ == iterator) {
           root_ = iterator->left_;
         }
@@ -117,8 +123,8 @@ class AVLTree {
         node_counter_--;
         delete iterator;
         return successor;
-      } else if (iterator->left_ == nullptr && // 오른쪽 자식 노드만 있는 경우
-                 iterator->right_ != nullptr) {
+      } else if (iterator->LeftIsNull() && // 오른쪽 자식 노드만 있는 경우
+                 !iterator->RightIsNull()) {
         if (this->root_ == iterator) {
           root_ = iterator->right_;
         }
@@ -126,8 +132,8 @@ class AVLTree {
         node_counter_--;
         delete iterator;
         return successor;
-      } else if (iterator->left_ != nullptr &&
-                 iterator->right_ != nullptr) { // 자식 노드가 2개인 경우
+      } else if (!iterator->LeftIsNull() &&
+                 !iterator->RightIsNull()) { // 자식 노드가 2개인 경우
         TreeNode<value_type>* successor =
             Minimum(iterator->right_->key()); // 후임자 탐색
         iterator->set_key(successor->key());
@@ -144,15 +150,12 @@ class AVLTree {
       iterator->left_ = EraseNode(iterator->left_, key_of_target);
       // iterator->left->parent = iterator;
     }
-    iterator->height_ =
-        (std::max(NodeHeight(iterator->left_), NodeHeight(iterator->right_))) +
-        1;
+    iterator->set_height(CalculateHeight(iterator));
     if (iterator != nullptr) {
       AdjustBalance(iterator, key_of_target);
     }
     // AVL 트리의 균형 연산 완료 후에 현재 노드의 size_ 값을 업데이트
-    iterator->set_size(1 + (iterator->left_ != nullptr ? iterator->left_->size() : 0)
-      + (iterator->right_ != nullptr ? iterator->right_->size() : 0));
+    iterator->set_size(CalculateSize(iterator));
     return iterator;
   }
   TreeNode<value_type>* FindNodePtr(value_type find_target) {
@@ -165,14 +168,14 @@ class AVLTree {
   }
   TreeNode<value_type>* Minimum(value_type x) {
     TreeNode<value_type>* iterator = FindNodePtr(x);
-    while (iterator->left_ != nullptr) {
+    while (!iterator->LeftIsNull()) {
       iterator = iterator->left_;
     }
     return iterator;
   }
   TreeNode<value_type>* Maximum(value_type x) {
     TreeNode<value_type>* iterator = FindNodePtr(x);
-    while (iterator->right_ != nullptr) {
+    while (!iterator->RightIsNull()) {
       iterator = iterator->right_;
     }
     return iterator;
@@ -182,7 +185,7 @@ class AVLTree {
       return 0;
     }
     if (target_node->key() <= x) {
-      if (target_node->left_ == nullptr) {
+      if (target_node->LeftIsNull()) {
         return 1 + Rank(target_node->right_, x);
       } else {
         return 1 + target_node->left_->size() + Rank(target_node->right_, x);
@@ -209,7 +212,13 @@ class AVLTree {
   }
 
  protected:
-  // clean;
+  int CalculateSize(TreeNode<value_type>* target_node) {
+    return 1 + (!target_node->LeftIsNull() ? target_node->left_->size() : 0)
+      + (!target_node->RightIsNull() ? target_node->right_->size() : 0);
+  }
+  int CalculateHeight(TreeNode<value_type>* target_node) {
+    return 1 + (std::max(NodeHeight(target_node->left_), NodeHeight(target_node->right_)));
+  }
   int CalculateBalance(TreeNode<value_type>* target_node) {
     if (target_node == nullptr) {
       return 0;
@@ -217,7 +226,7 @@ class AVLTree {
     return NodeHeight(target_node->left_) - NodeHeight(target_node->right_);
   };
   TreeNode<value_type>* LLRotation(TreeNode<value_type>*& old_axis) {
-    if (old_axis->right_ == nullptr) {
+    if (old_axis->RightIsNull()) {
       return old_axis;
     }
     TreeNode<value_type>* new_axis = old_axis->right_;
@@ -227,23 +236,17 @@ class AVLTree {
     if (old_axis == root_) {
       root_ = new_axis;
     }
-    old_axis->set_height(
-        std::max(NodeHeight(old_axis->left_), NodeHeight(old_axis->right_)) +
-        1);
-    new_axis->set_height(
-        std::max(NodeHeight(new_axis->left_), NodeHeight(new_axis->right_)) +
-        1);
+    old_axis->set_height(CalculateHeight(old_axis));
+    new_axis->set_height(CalculateHeight(new_axis));
 
-    old_axis->set_size(1 + (old_axis->left_ != nullptr ? old_axis->left_->size() : 0)
-      + (old_axis->right_ != nullptr ? old_axis->right_->size() : 0));
-    new_axis->set_size(1 + (new_axis->left_ != nullptr ? new_axis->left_->size() : 0)
-      + (new_axis->right_ != nullptr ? new_axis->right_->size() : 0));
+    old_axis->set_size(CalculateSize(old_axis));
+    new_axis->set_size(CalculateSize(new_axis));
 
     return new_axis;
   }
 
   TreeNode<value_type>* RRRotation(TreeNode<value_type>*& old_axis) {
-    if (old_axis->left_ == nullptr) {
+    if (old_axis->LeftIsNull()) {
       return old_axis;
     }
     TreeNode<value_type>* new_axis = old_axis->left_;
@@ -252,18 +255,11 @@ class AVLTree {
     if (old_axis == root_) {
       root_ = new_axis;
     }
+    old_axis->set_height(CalculateHeight(old_axis));
+    new_axis->set_height(CalculateHeight(new_axis));
 
-    old_axis->set_height(
-        std::max(NodeHeight(old_axis->left_), NodeHeight(old_axis->right_)) +
-        1);
-    new_axis->set_height(
-        std::max(NodeHeight(new_axis->left_), NodeHeight(new_axis->right_)) +
-        1);
-
-    old_axis->set_size(1 + (old_axis->left_ != nullptr ? old_axis->left_->size() : 0)
-      + (old_axis->right_ != nullptr ? old_axis->right_->size() : 0));
-    new_axis->set_size(1 + (new_axis->left_ != nullptr ? new_axis->left_->size() : 0)
-      + (new_axis->right_ != nullptr ? new_axis->right_->size() : 0));
+    old_axis->set_size(CalculateSize(old_axis));
+    new_axis->set_size(CalculateSize(new_axis));
     
     return new_axis;
   }

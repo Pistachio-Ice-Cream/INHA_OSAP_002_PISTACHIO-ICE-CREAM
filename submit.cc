@@ -223,50 +223,50 @@ template <typename value_type>
 class AVLSet : public Set<value_type> {
  public:
   AVLSet() {
-    tree = AVLTree<value_type>();
+    container = AVLTree<value_type>();
   }
   ~AVLSet() {
-    tree.~AVLTree();
+    container.~AVLTree();
   }
   void Minimum(value_type x) {
-    if (tree.IsEmpty()) {
+    if (container.IsEmpty()) {
       return;
     } else {
-      TreeNode<value_type>* tmp = tree.Minimum(x);
-      std::cout << tmp->key() << " " << tree.FindDepth(tmp->key()) << "\n";
+      TreeNode<value_type>* tmp = container.Minimum(x);
+      std::cout << tmp->key() << " " << container.FindDepth(tmp->key()) << "\n";
     }
   }
   void Maximum(value_type x) {
-    if (tree.IsEmpty()) {
+    if (container.IsEmpty()) {
       return;
     } else {
-      TreeNode<value_type>* tmp = tree.Maximum(x);
-      std::cout << tmp->key() << " " << tree.FindDepth(tmp->key()) << "\n";
+      TreeNode<value_type>* tmp = container.Maximum(x);
+      std::cout << tmp->key() << " " << container.FindDepth(tmp->key()) << "\n";
     }
   }
   void Empty() {
-    std::cout << tree.IsEmpty() << "\n";
+    std::cout << container.IsEmpty() << "\n";
   }
   void Size() {
-    std::cout << tree.Size() << "\n";
+    std::cout << container.Size() << "\n";
   }
   void Find(value_type x) {
-    if (tree.FindNodePtr(x) == nullptr) {
+    if (container.FindNodePtr(x) == nullptr) {
       std::cout << "0"
                 << "\n";
     } else {
-      std::cout << tree.FindDepth(x) << "\n";
+      std::cout << container.FindDepth(x) << "\n";
     }
   }
   void Insert(value_type x) {
-    tree.InsertNode(tree.root(), x);
-    std::cout << tree.FindDepth(x) << "\n";
+    container.InsertNode(container.root(), x);
+    std::cout << container.FindDepth(x) << "\n";
   }
   // void Rank(value_type x);
   // void Erase(value_type x);
 
  private:
-  AVLTree<value_type> tree;
+  AVLTree<value_type> container;
 };
 int main() {
   std::ios_base::sync_with_stdio(false);

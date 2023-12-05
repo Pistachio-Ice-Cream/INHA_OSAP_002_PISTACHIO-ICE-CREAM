@@ -68,10 +68,10 @@ class AVLTree {
   }
   ~AVLTree() {
   }
-  bool IsEmpty() {
+  bool IsEmpty() const {
     return node_counter_ == 0;
   }
-  int Size() {
+  int Size() const {
     return node_counter_;
   }
   TreeNode<value_type>* InsertNode(TreeNode<value_type>* iterator,
@@ -97,7 +97,7 @@ class AVLTree {
     AdjustBalance(iterator, key_of_new_node);
     // AVL 트리의 균형 연산 완료 후에 현재 노드의 size_ 값을 업데이트
     iterator->set_size(CalculateSize(iterator));
-    
+
     return iterator;
   }
   // iterator=new_node로 설정하는 부분 한 줄 추가했습니다.
@@ -158,7 +158,7 @@ class AVLTree {
     iterator->set_size(CalculateSize(iterator));
     return iterator;
   }
-  TreeNode<value_type>* FindNodePtr(value_type find_target) {
+  TreeNode<value_type>* FindNodePtr(value_type find_target) const {
     TreeNode<value_type>* iterator = root_;
     while (iterator != nullptr && iterator->key() != find_target) {
       iterator =
@@ -166,14 +166,14 @@ class AVLTree {
     }
     return iterator;
   }
-  TreeNode<value_type>* Minimum(value_type x) {
+  TreeNode<value_type>* Minimum(value_type x) const {
     TreeNode<value_type>* iterator = FindNodePtr(x);
     while (!iterator->LeftIsNull()) {
       iterator = iterator->left_;
     }
     return iterator;
   }
-  TreeNode<value_type>* Maximum(value_type x) {
+  TreeNode<value_type>* Maximum(value_type x) const {
     TreeNode<value_type>* iterator = FindNodePtr(x);
     while (!iterator->RightIsNull()) {
       iterator = iterator->right_;
@@ -192,7 +192,7 @@ class AVLTree {
       }
     } else {
       return Rank(target_node->left_, x);
-    }  
+    }
   }
   int NodeHeight(TreeNode<value_type>* target_node) const {
     if (target_node == nullptr) {
@@ -200,7 +200,7 @@ class AVLTree {
     }
     return target_node->height();
   }
-  int FindDepth(value_type find_target) {
+  int FindDepth(value_type find_target) const {
     TreeNode<value_type>* iterator = root_;
     int depth_counter = 0;
     while (iterator != nullptr && iterator->key() != find_target) {
@@ -212,14 +212,15 @@ class AVLTree {
   }
 
  protected:
-  int CalculateSize(TreeNode<value_type>* target_node) {
-    return 1 + (!target_node->LeftIsNull() ? target_node->left_->size() : 0)
-      + (!target_node->RightIsNull() ? target_node->right_->size() : 0);
+  int CalculateSize(TreeNode<value_type>* target_node) const {
+    return 1 + (!target_node->LeftIsNull() ? target_node->left_->size() : 0) +
+           (!target_node->RightIsNull() ? target_node->right_->size() : 0);
   }
-  int CalculateHeight(TreeNode<value_type>* target_node) {
-    return 1 + (std::max(NodeHeight(target_node->left_), NodeHeight(target_node->right_)));
+  int CalculateHeight(TreeNode<value_type>* target_node) const {
+    return 1 + (std::max(NodeHeight(target_node->left_),
+                         NodeHeight(target_node->right_)));
   }
-  int CalculateBalance(TreeNode<value_type>* target_node) {
+  int CalculateBalance(TreeNode<value_type>* target_node) const {
     if (target_node == nullptr) {
       return 0;
     }
@@ -260,7 +261,7 @@ class AVLTree {
 
     old_axis->set_size(CalculateSize(old_axis));
     new_axis->set_size(CalculateSize(new_axis));
-    
+
     return new_axis;
   }
   // 주석은 기존 코드입니다.
@@ -308,84 +309,122 @@ class AVLTree {
     return new_node;
   }
 };
-template <typename value_type>
+template <typename value_type, typename Container>
 class Set {
  public:
   Set(){};
   ~Set(){};
-  void Minimum(value_type x){};
-  void Maximum(value_type x){};
-  void Empty(){};
-  void Size(){};
-  void Find(value_type x){};
-  void Insert(value_type x){};
-  void Rank(value_type x){};
-  void Erase(value_type x){};
+  virtual void Minimum(value_type x) const = 0;
+  virtual void Maximum(value_type x) const = 0;
+  virtual void Empty() const = 0;
+  virtual void Size() const = 0;
+  virtual void Find(value_type x) const = 0;
+  virtual void Insert(value_type x) = 0;
+  virtual void Rank(value_type x) = 0;
+  virtual void Erase(value_type x) = 0;
+
+ protected:
+  Container container_;
 };
 
-template <typename value_type>
-class AVLSet : public Set<value_type> {
+template <typename value_type, typename Container>
+class AVLSet : public Set<value_type, Container> {
  public:
-  AVLSet() {
-    tree = AVLTree<value_type>();
+  AVLSet() : container_(AVLTree<value_type>()) {
   }
   ~AVLSet() {
-    tree.~AVLTree();
+    container_.~AVLTree();
   }
-  void Minimum(value_type x) {
-    if (tree.IsEmpty()) {
+  void Minimum(value_type x) const override {
+    if (container_.IsEmpty()) {
       return;
     } else {
-      TreeNode<value_type>* tmp = tree.Minimum(x);
-      std::cout << tmp->key() << " " << tree.FindDepth(tmp->key()) << "\n";
+      TreeNode<value_type>* tmp = container_.Minimum(x);
+      std::cout << tmp->key() << " " << container_.FindDepth(tmp->key())
+                << "\n";
     }
   }
-  void Maximum(value_type x) {
-    if (tree.IsEmpty()) {
+  void Maximum(value_type x) const override {
+    if (container_.IsEmpty()) {
       return;
     } else {
-      TreeNode<value_type>* tmp = tree.Maximum(x);
-      std::cout << tmp->key() << " " << tree.FindDepth(tmp->key()) << "\n";
+      TreeNode<value_type>* tmp = container_.Maximum(x);
+      std::cout << tmp->key() << " " << container_.FindDepth(tmp->key())
+                << "\n";
     }
   }
-  void Empty() {
-    std::cout << tree.IsEmpty() << "\n";
+  void Empty() const override {
+    std::cout << container_.IsEmpty() << "\n";
   }
-  void Size() {
-    std::cout << tree.Size() << "\n";
+  void Size() const override {
+    std::cout << container_.Size() << "\n";
   }
-  void Find(value_type x) {
-    if (tree.FindNodePtr(x) == nullptr) {
+  void Find(value_type x) const override {
+    if (container_.FindNodePtr(x) == nullptr) {
       std::cout << "0"
                 << "\n";
     } else {
-      std::cout << tree.FindDepth(x) << "\n";
+      std::cout << container_.FindDepth(x) << "\n";
     }
   }
-  void Insert(value_type x) {
-    tree.InsertNode(tree.root(), x);
-    std::cout << tree.FindDepth(x) << "\n";
+  void Insert(value_type x) override {
+    container_.InsertNode(container_.root(), x);
+    std::cout << container_.FindDepth(x) << "\n";
   }
-  void Rank(value_type x) {
-    if (tree.FindNodePtr(x) == nullptr) {
-      std::cout << "0" << "\n";
-    }
-    else {
-      std::cout << tree.FindDepth(x) << " " << tree.Rank(tree.root(), x) << "\n";
-    }
-  }
-  void Erase(value_type x) {
-    if (tree.FindNodePtr(x) == nullptr) {
+  void Rank(value_type x) override {
+    if (container_.FindNodePtr(x) == nullptr) {
       std::cout << "0"
                 << "\n";
     } else {
-      std::cout << tree.FindDepth(x) << "\n";
-      tree.EraseNode(tree.root(), x);
+      std::cout << container_.FindDepth(x) << " "
+                << container_.Rank(container_.root(), x) << "\n";
+    }
+  }
+  void Erase(value_type x) override {
+    if (container_.FindNodePtr(x) == nullptr) {
+      std::cout << "0"
+                << "\n";
+    } else {
+      std::cout << container_.FindDepth(x) << "\n";
+      container_.EraseNode(container_.root(), x);
     }
   };
 
  private:
-  AVLTree<value_type> tree;
+  AVLTree<value_type> container_;
+};
+template <typename value_type, typename Container>
+class UserInterface {
+ public:
+  UserInterface(Container& container) : object_(container) {
+  }
+  void minimum(value_type x) {
+    object_.Minimum(x);
+  }
+  void maximum(value_type x) {
+    object_.Maximum(x);
+  }
+  void empty() {
+    object_.Empty();
+  }
+  void size() {
+    object_.Size();
+  }
+  void find(value_type x) {
+    object_.Find(x);
+  }
+  void insert(value_type x) {
+    object_.Insert(x);
+  }
+  void rank(value_type x) {
+    object_.Rank(x);
+  }
+  void erase(value_type x) {
+    object_.Erase(x);
+  }
+
+ private:
+  Container& object_;
 };
 int main() {
   std::ios_base::sync_with_stdio(false);
@@ -396,38 +435,39 @@ int main() {
   while (T--) {
     int Q;
     std::cin >> Q;
-    AVLSet<int> s;
+    Set<int, AVLTree<int>>* container = new AVLSet<int, AVLTree<int>>();
+    UserInterface<int, Set<int, AVLTree<int>>> ui(*container);
     while (Q--) {
       std::string cmd;
       std::cin >> cmd;
       if (cmd == "minimum") {
         int x;
         std::cin >> x;
-        s.Minimum(x);
+        ui.minimum(x);
       } else if (cmd == "maximum") {
         int x;
         std::cin >> x;
-        s.Maximum(x);
+        ui.maximum(x);
       } else if (cmd == "empty") {
-        s.Empty();
+        ui.empty();
       } else if (cmd == "size") {
-        s.Size();
+        ui.size();
       } else if (cmd == "find") {
         int x;
         std::cin >> x;
-        s.Find(x);
+        ui.find(x);
       } else if (cmd == "rank") {
         int x;
         std::cin >> x;
-        s.Rank(x);
+        ui.rank(x);
       } else if (cmd == "erase") {
         int x;
         std::cin >> x;
-        s.Erase(x);
+        ui.erase(x);
       } else if (cmd == "insert") {
         int x;
         std::cin >> x;
-        s.Insert(x);
+        ui.insert(x);
       }
     }
   }

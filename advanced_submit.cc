@@ -76,13 +76,22 @@ class AVLTree {
   }
   TreeNode<value_type>* InsertNode(TreeNode<value_type>* iterator,
                                    value_type key_of_new_node) {
+    /*
+   노드 삽입 및 이에 따른 후처리 작업 함수
+   iterator를 이 노드가 삽입돼야 할 위치로 이동시킨 후,
+   있어야 할 빈 공간을 찾으면 해당 위치에 새로운 노드를 생성합니다.
+   재귀적으로 부모 노드는 새로운 노드를 자식 노드로 포인팅합니다.
+   */
     if (IsEmpty()) {
+      // 만약 빈 트리라면, 루트 노드를 생성하고 바로 리턴합니다.
       root_ = new TreeNode<value_type>;
       root_->set_key(key_of_new_node);
       this->node_counter_++;
       return root_;
     }
     if (iterator == nullptr) {
+      // iterator가 있어야 할 위치의 빈 공간을 찾았습니다.
+      // 해당 위치에 새로운 노드를 추가합니다.
       TreeNode<value_type>* new_node = new TreeNode<value_type>;
       this->node_counter_++;
       iterator = new_node;
@@ -93,11 +102,14 @@ class AVLTree {
     } else {
       iterator->left_ = InsertNode(iterator->left_, key_of_new_node);
     }
+    // 새로운 노드를 삽입하는 재귀적 과정이 끝납니다.
+    /*재귀적으로 자식 노드들로부터 Height를 계산해줍니다.
+      새로 추가한 노드부터 리턴되며 재귀적으로 Height를 계산하게 될 것입니다.*/
     iterator->set_height(CalculateHeight(iterator));
     AdjustBalance(iterator, key_of_new_node);
     // AVL 트리의 균형 연산 완료 후에 현재 노드의 size_ 값을 업데이트
     iterator->set_size(CalculateSize(iterator));
-
+    // 삽입 과정을 마친 후 밸런스 조정 함수로 넘어갑니다.
     return iterator;
   }
   // iterator=new_node로 설정하는 부분 한 줄 추가했습니다.
@@ -264,13 +276,19 @@ class AVLTree {
 
     return new_axis;
   }
-  // 주석은 기존 코드입니다.
 
   void AdjustBalance(TreeNode<value_type>*& axis, value_type& target_key) {
+    // 축과 키를 기준으로 밸런스를 조정합니다.
+
+    // balance_factor가 -1,0,1이면 AVLTree의 밸런스를 만족합니다. 조정 필요 x
     int balance_factor = CalculateBalance(axis);
     if (balance_factor == -1 || balance_factor == 0 || balance_factor == 1) {
       return;
     }
+    // 왼쪽이 높고, 새로운 노드도 왼쪽에 있다.->오른쪽 로테이션 1번으로 해결
+    // 왼쪽이 높고, 새로운 노드는 축 왼쪽에 있다.->좌회전-> 우회전
+    // 오른쪽이 높고, 새로운 노드는 축 오른쪽에 있다.->우회전 한 번
+    // 오른쪽이 높고, 새로운 노드는 축 왼쪽에 있다.->우회전->좌회전
 
     if (balance_factor > 1) {
       balance_factor = CalculateBalance(axis->left_);

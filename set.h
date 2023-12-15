@@ -29,6 +29,8 @@ class AVLSet : public Set<value_type, Container> {
  public:
   AVLSet() : container_(AVLTree<value_type>()) {
   }
+  AVLSet(const AVLSet& copy_target) : container_(copy_target.container_) {
+  }
   ~AVLSet() {
     container_.~AVLTree();
   }

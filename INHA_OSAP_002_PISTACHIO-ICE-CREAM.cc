@@ -70,6 +70,7 @@ class AVLTree {
     root_ = CopyTree(copy_target.root());
   }
   ~AVLTree() {
+    DeleteTree(root_);
   }
   bool IsEmpty() const {
     return node_counter_ == 0;
@@ -352,6 +353,15 @@ class AVLTree {
   int node_counter_ = 0;
   TreeNode<value_type>* root_;
 
+  void DeleteTree(TreeNode<value_type>* node) {
+    // 소멸자를 위한 중위 순회 코드입니다.
+    if (node != nullptr) {
+      DeleteTree(node->left_);
+      DeleteTree(node->right_);
+      delete node;
+    }
+  }
+
   TreeNode<value_type>* CopyTree(const TreeNode<value_type>* node) {
     // 복사생성자를 위한, node copy함수의 집합입니다.
     if (node == nullptr) {
@@ -389,6 +399,8 @@ template <typename value_type, typename Container>
 class AVLSet : public Set<value_type, Container> {
  public:
   AVLSet() : container_(AVLTree<value_type>()) {
+  }
+  AVLSet(const AVLSet& copy_target) : container_(copy_target.container_) {
   }
   ~AVLSet() {
     container_.~AVLTree();

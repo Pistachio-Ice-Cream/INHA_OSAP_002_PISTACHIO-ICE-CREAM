@@ -183,6 +183,166 @@ TEST_F(TestAVLTree, InsertNode) {
   ASSERT_EQ(avl_tree->Size(), 7);
 }
 
+TEST(NodeTests, TestKey) {
+  Node<int> node;
+  node->set_key(1);
+  ASSERT_EQ(1, node->key());
+}
+
+class TreeNodeTest : public ::testing::Test {
+ protected:
+  TreeNode<int>* node;
+
+  void SetUp() override {
+    node = new TreeNode<int>();
+  }
+
+  void TearDown() override {
+    delete node;
+  }
+};
+
+TEST_F(TreeNodeTest, CheckHeight) {
+  node->set_height(5);
+  EXPECT_EQ(node->height(), 5);
+}
+
+TEST_F(TreeNodeTest, CheckSize) {
+  node->set_size(10);
+  EXPECT_EQ(node->size(), 10);
+}
+
+TEST_F(TreeNodeTest, CheckLeftIsNull) {
+  EXPECT_TRUE(node->LeftIsNull());
+  node->left_ = new TreeNode<int>();
+  EXPECT_FALSE(node->LeftIsNull());
+  delete node->left_;
+}
+
+TEST_F(TreeNodeTest, CheckRightIsNull) {
+  EXPECT_TRUE(node->RightIsNull());
+  node->right_ = new TreeNode<int>();
+  EXPECT_FALSE(node->RightIsNull());
+  delete node->right_;
+}
+
+TEST_F(TreeNodeTest, CheckNoChild) {
+  EXPECT_TRUE(node->NoChild());
+  node->left_ = new TreeNode<int>();
+  EXPECT_FALSE(node->NoChild());
+  delete node->left_;
+  node->right_ = new TreeNode<int>();
+  EXPECT_FALSE(node->NoChild());
+  delete node->right_;
+}
+
+class AVLTreeTest : public ::testing::Test {
+ protected:
+  AVLTree<int>* tree;
+
+  void SetUp() override {
+    tree = new AVLTree<int>();
+    SetUpTestCase();
+  }
+
+  void TearDown() override {
+    delete tree;
+  }
+
+  void SetUpTestCase() {
+    tree.InsertNode(tree->root(), 1);
+    tree.InsertNode(tree->root(), 2);
+    tree.InsertNode(tree->root(), 3);
+    tree.InsertNode(tree->root(), 4);
+    tree.InsertNode(tree->root(), 5);
+    tree.InsertNode(tree->root(), 6);
+    /*
+            3
+          /   \
+        2      5
+       /      / \
+      1      4   6
+    */
+  }
+};
+
+TEST_F(AVLTreeTest, TestRoot) {
+  EXPECT_TRUE(tree->root() != nullptr);
+}
+
+TEST_F(AVLTreeTest, TestCopyConstructor) {
+  AVLTree<int> copy_tree(*tree);
+  EXPECT_TRUE(copy_tree->root() != nullptr);
+}
+
+TEST_F(AVLTreeTest, TestIsEmpty) {
+  EXPECT_FALSE(tree.IsEmpty());
+}
+
+TEST_F(AVLTreeTest, TestSize) {
+  EXPECT_EQ(tree.Size(), 6);
+}
+
+TEST_F(AVLTreeTest, TestFindNodePtr) {
+  ASSERT_EQ(tree.FindNodePtr(1)->key(), 1);
+  ASSERT_EQ(tree.FindNodePtr(2)->key(), 2);
+  ASSERT_EQ(tree.FindNodePtr(3)->key(), 3);
+  ASSERT_EQ(tree.FindNodePtr(4)->key(), 4);
+  ASSERT_EQ(tree.FindNodePtr(5)->key(), 5);
+  ASSERT_EQ(tree.FindNodePtr(6)->key(), 6);
+}
+
+TEST_F(AVLTreeTest, TestMinimum) {
+  ASSERT_EQ(tree.Minimum()->key(), 1);
+}
+
+TEST_F(AVLTreeTest, TestMaximum) {
+  ASSERT_EQ(tree.Maximum()->key(), 6);
+}
+
+TEST_F(AVLTreeTest, TestRank) {
+  ASSERT_EQ(tree.Rank(tree->root(), 1), 1);
+  ASSERT_EQ(tree.Rank(tree->root(), 2), 2);
+  ASSERT_EQ(tree.Rank(tree->root(), 3), 3);
+  ASSERT_EQ(tree.Rank(tree->root(), 4), 4);
+  ASSERT_EQ(tree.Rank(tree->root(), 5), 5);
+  ASSERT_EQ(tree.Rank(tree->root(), 6), 6);
+}
+
+TEST_F(AVLTreeTest, TestNodeHeight) {
+  ASSERT_EQ(tree.NodeHeight(tree->root()), 2);
+  ASSERT_EQ(tree.NodeHeight(tree->root()->left_), 1);
+  ASSERT_EQ(tree.NodeHeight(tree->root()->right_), 1);
+  ASSERT_EQ(tree.NodeHeight(tree->root()->right_->right_), 0);
+}
+
+TEST_F(AVLTreeTest, TestFindDepth) {
+  ASSERT_EQ(tree.FindDepth(3), 1);
+  ASSERT_EQ(tree.FindDepth(2), 2);
+  ASSERT_EQ(tree.FindDepth(5), 2);
+  ASSERT_EQ(tree.FindDepth(1), 3);
+  ASSERT_EQ(tree.FindDepth(4), 3);
+  ASSERT_EQ(tree.FindDepth(6), 3);
+}
+
+TEST_F(AVLTreeTest, TestCalculateHeight) {
+  ASSERT_EQ(tree.CalculateHeight(tree->root()), 2);
+  ASSERT_EQ(tree.CalculateHeight(tree->root()->left_), 1);
+  ASSERT_EQ(tree.CalculateHeight(tree->root()->right_), 1);
+  ASSERT_EQ(tree.CalculateHeight(tree->root()->right_->right_), 0);
+}
+
+TEST_F(AVLTreeTest, TestCalculateSize) {
+  ASSERT_EQ(tree.CalculateSize(tree->root()), 6);
+  ASSERT_EQ(tree.CalculateSize(tree->root()->left_), 2);
+  ASSERT_EQ(tree.CalculateSize(tree->root()->right_), 3);
+  ASSERT_EQ(tree.CalculateSize(tree->root()->right_->right_), 1);
+}
+
+TEST_F(AVLTreeTest, TestCalculateBalance) {
+  ASSERT_EQ(tree.CalculateBalance(tree->root()), 0);
+}
+
 int main(int argc, char** argv) {
   testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();

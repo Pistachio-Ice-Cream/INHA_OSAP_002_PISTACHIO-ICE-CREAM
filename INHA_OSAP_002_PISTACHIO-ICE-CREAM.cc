@@ -70,6 +70,7 @@ class AVLTree {
     root_ = CopyTree(copy_target.root());
   }
   ~AVLTree() {
+    DeleteTree(root_);
   }
   bool IsEmpty() const {
     return node_counter_ == 0;

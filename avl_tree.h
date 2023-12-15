@@ -23,7 +23,9 @@ class AVLTree {
     root_ = CopyTree(copy_target.root());
   }
   ~AVLTree() {
+    DeleteTree(root_);
   }
+
   bool IsEmpty() const {
     return node_counter_ == 0;
   }
@@ -304,6 +306,15 @@ class AVLTree {
  protected:
   int node_counter_ = 0;
   TreeNode<value_type>* root_;
+
+  void DeleteTree(TreeNode<value_type>* node) {
+    // 소멸자를 위한 중위 순회 코드입니다.
+    if (node != nullptr) {
+      DeleteTree(node->left());
+      DeleteTree(node->right());
+      delete node;
+    }
+  }
 
   TreeNode<value_type>* CopyTree(const TreeNode<value_type>* node) {
     // 복사생성자를 위한, node copy함수의 집합입니다.

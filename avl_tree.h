@@ -23,7 +23,6 @@ class AVLTree {
     root_ = CopyTree(copy_target.root());
   }
   ~AVLTree() {
-    DeleteTree(root_);
   }
 
   bool IsEmpty() const {
@@ -310,8 +309,8 @@ class AVLTree {
   void DeleteTree(TreeNode<value_type>* node) {
     // 소멸자를 위한 중위 순회 코드입니다.
     if (node != nullptr) {
-      DeleteTree(node->left());
-      DeleteTree(node->right());
+      DeleteTree(node->left_);
+      DeleteTree(node->right_);
       delete node;
     }
   }

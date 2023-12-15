@@ -49,12 +49,10 @@ class TreeNode : public Node<value_type> {
     return ((left_ == nullptr) && (right_ == nullptr));
   }
 
- public:
+ private:
   TreeNode* left_ = nullptr;
   TreeNode* right_ = nullptr;
   friend class AVLTree<value_type>;
-
- private:
   int height_ = 0;
   int size_ = 1;
 };

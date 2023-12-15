@@ -8,65 +8,47 @@ Created At: 2023-11-12, Created By: {rla1wo23, rla1wo23@gmail.com}.
 #include <algorithm>
 #include <iostream>
 
-template <typename value_type>
-class Node {
- public:
-  value_type key() const;
-  void set_key(value_type new_key);
-
- protected:
-  value_type key_;
-};
-template <typename value_type>
-class AVLTree;
-
-template <typename value_type>
-class TreeNode : public Node<value_type> {
-  // Tree에서는 Node로 해당 클래스를 사용하도록 함.
- public:
-  int height() const;
-  void set_height(int new_height);
-  void Balancing();
-
- public:
-  TreeNode* left_ = nullptr;
-  TreeNode* right_ = nullptr;
-  friend class AVLTree<value_type>;
-
- private:
-  int height_ = 0;
-};
+#include "nodes.h"
 
 template <typename value_type>
 class AVLTree {
  public:
-  TreeNode<value_type>* root() const; // root_ getter 메소드
-  AVLTree();
-  AVLTree(const AVLTree& copy_target);
+  AVLTree() : root_(new TreeNode<value_type>){};
+  AVLTree(const AVLTree& copy_target) : root_(CopyTree(copy_target.root()));
   ~AVLTree();
-  bool IsEmpty();
-  int Size();
+  TreeNode<value_type>* root() const {
+    return root_;
+  }
+  bool IsEmpty() const {
+    return node_counter_ == 0;
+  }
+  int Size() const {
+    return node_counter_;
+  }
   TreeNode<value_type>* InsertNode(TreeNode<value_type>* iterator,
                                    value_type key_of_new_node);
-  TreeNode<value_type>* FindNodePtr(value_type find_target);
-  TreeNode<value_type>* Minimum(value_type x);
-  TreeNode<value_type>* Maximum(value_type x);
-  void Rank(value_type x);
-  void Erase(value_type x);
+  // iterator=new_node로 설정하는 부분 한 줄 추가했습니다.
+  TreeNode<value_type>* EraseNode(TreeNode<value_type>* iterator,
+                                  value_type key_of_target);
+  TreeNode<value_type>* FindNodePtr(value_type find_target) const;
+  TreeNode<value_type>* Minimum(value_type x) const;
+  TreeNode<value_type>* Maximum(value_type x) const;
+  int Rank(TreeNode<value_type>* target_node, value_type x);
   int NodeHeight(TreeNode<value_type>* target_node) const;
-  int FindDepth(value_type find_target);
+  int FindDepth(value_type find_target) const;
 
  protected:
-  int CalculateBalance(TreeNode<value_type>* target_node);
+  int CalculateSize(TreeNode<value_type>* target_node) const;
+  int CalculateHeight(TreeNode<value_type>* target_node) const;
+  int CalculateBalance(TreeNode<value_type>* target_node) const;
   TreeNode<value_type>* LLRotation(TreeNode<value_type>*& old_axis);
   TreeNode<value_type>* RRRotation(TreeNode<value_type>*& old_axis);
   void AdjustBalance(TreeNode<value_type>*& axis, value_type& target_key);
-  TreeNode<value_type>* EraseNode(TreeNode<value_type>* root_node,
-                                  value_type key_of_target);
 
  protected:
   int node_counter_ = 0;
   TreeNode<value_type>* root_;
+
   TreeNode<value_type>* CopyTree(const TreeNode<value_type>* node);
 };
 #endif

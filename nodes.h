@@ -1,3 +1,8 @@
+/*
+Copyright (c) 2023 Pistachio-Ice-Cream.
+Distributed under the MIT License (http://opensource.org/licenses/MIT).
+Created At: 2023-12-14, Created By: {rla1wo23}.
+*/
 #ifndef NODES_H
 #define NODES_H
 #include "avl_tree.h"

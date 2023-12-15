@@ -5,6 +5,8 @@ Created At: 2023-11-12, Created By: {rla1wo23}.
 */
 #include <iostream>
 
+#include "avl_tree.h"
+#include "nodes.h"
 #include "set.h"
 
 template <typename value_type, typename Container>

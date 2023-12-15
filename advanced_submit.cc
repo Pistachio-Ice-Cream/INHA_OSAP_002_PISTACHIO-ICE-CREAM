@@ -1,3 +1,8 @@
+/*
+Copyright (c) 2023 Pistachio-Ice-Cream.
+Distributed under the MIT License (http://opensource.org/licenses/MIT).
+Created At: 2023-11-23, Created By: {rla1wo23}.
+*/
 #include <algorithm>
 #include <iostream>
 
@@ -285,10 +290,10 @@ class AVLTree {
     if (balance_factor == -1 || balance_factor == 0 || balance_factor == 1) {
       return;
     }
-    // 왼쪽이 높고, 새로운 노드도 왼쪽에 있다.->오른쪽 로테이션 1번으로 해결
-    // 왼쪽이 높고, 새로운 노드는 축 왼쪽에 있다.->좌회전-> 우회전
-    // 오른쪽이 높고, 새로운 노드는 축 오른쪽에 있다.->우회전 한 번
-    // 오른쪽이 높고, 새로운 노드는 축 왼쪽에 있다.->우회전->좌회전
+    // LL케이스->오른쪽 로테이션 1번으로 해결
+    // LR케이스.->좌회전-> 우회전
+    // RR케이스->우회전 한 번
+    // RL케이스.->우회전->좌회전
 
     if (balance_factor > 1) {
       balance_factor = CalculateBalance(axis->left_);
